@@ -38,10 +38,11 @@ public class ProfileManager {
 			LinkedTreeMap<String, String> credentials = this.gson.fromJson(rawCredentials, typeOfHashMap);
 
 			this.authenticationService.loadFromStorage(credentials);
-
 			this.authenticationService.logIn();
+			this.saveProfile();
 		} catch (Exception e) {
 			Launcher.getInstance().println("Couldn't load profile.");
+			this.authenticationService.logOut();
 		}
 	}
 

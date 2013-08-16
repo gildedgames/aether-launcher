@@ -23,9 +23,7 @@ public class RemoteVersionList extends VersionList {
 	}
 
 	protected String getUrl(String uri) throws IOException {
-		// return Http.performGet(new
-		// URL("https://s3.amazonaws.com/Minecraft.Download/" + uri),
-		// this.proxy);
+		// return Http.performGet(new URL("https://s3.amazonaws.com/Minecraft.Download/" + uri), this.proxy);
 
 		InputStream inputStream = new FileInputStream(new File("/Users/cafaxo/documents/launcher/remote/", uri));
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

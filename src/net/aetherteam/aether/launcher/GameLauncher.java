@@ -19,7 +19,6 @@ import net.aetherteam.aether.launcher.download.DownloadJob;
 import net.aetherteam.aether.launcher.download.DownloadListener;
 import net.aetherteam.aether.launcher.download.Downloadable;
 import net.aetherteam.aether.launcher.gui.forms.LoadingForm;
-import net.aetherteam.aether.launcher.gui.forms.OptionsForm;
 import net.aetherteam.aether.launcher.process.JavaProcess;
 import net.aetherteam.aether.launcher.process.JavaProcessLauncher;
 import net.aetherteam.aether.launcher.process.JavaProcessRunnable;
@@ -46,7 +45,13 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 	public void run() {
 		Launcher.getInstance().println("Getting syncinfo for selected version");
 
-		VersionSyncInfo syncInfo = Launcher.getInstance().getVersionManager().getVersionSyncInfo(OptionsForm.instance.getSelectedVersion());
+		String selectedVersion = Launcher.getInstance().getProfileManager().getAuthenticationService().getSelectedVersion();
+
+		if (selectedVersion == null) {
+			selectedVersion = Launcher.getInstance().getVersionManager().getVersions()[0];
+		}
+
+		VersionSyncInfo syncInfo = Launcher.getInstance().getVersionManager().getVersionSyncInfo(selectedVersion);
 
 		Launcher.getInstance().println("Queueing library & version downloads");
 		try {

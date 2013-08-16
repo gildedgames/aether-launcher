@@ -64,11 +64,11 @@ public abstract class GuiElement {
 	}
 
 	public boolean containsPoint(int x, int y) {
-		return (x >= this.x) && (x <= (this.x + this.width)) && (y >= this.y) && (y <= (this.y + this.height));
+		return (x >= this.getFadingX()) && (x <= (this.getFadingX() + this.width)) && (y >= this.y) && (y <= (this.y + this.height));
 	}
 
 	public boolean isMouseHovering() {
-		return this.containsPoint(Mouse.getX(), Display.getHeight() - Mouse.getY()) && this.form.isFocused();
+		return this.containsPoint(Mouse.getX(), Display.getHeight() - Mouse.getY());
 	}
 
 	public int getX() {

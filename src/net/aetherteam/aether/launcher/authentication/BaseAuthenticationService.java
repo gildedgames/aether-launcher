@@ -28,6 +28,8 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 
 	private boolean shouldRememberMe = true;
 
+	private String selectedVersion;
+
 	public boolean canLogIn() {
 		return (!this.canPlayOnline()) && (StringUtils.isNotBlank(this.getUsername())) && (StringUtils.isNotBlank(this.getPassword()));
 	}
@@ -76,6 +78,8 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 			this.setRememberMe(Boolean.getBoolean(credentials.get("rememberMe")));
 		}
 
+		this.selectedVersion = credentials.get("selectedVersion");
+
 		this.setUsername(credentials.get("username"));
 		Launcher.getInstance().setClientToken(UUID.fromString(credentials.get("clientToken")));
 
@@ -91,6 +95,8 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 			result.put("rememberMe", Boolean.toString(false));
 			return result;
 		}
+
+		result.put("selectedVersion", this.selectedVersion);
 
 		if (this.getUsername() != null) {
 			result.put("username", this.getUsername());
@@ -120,6 +126,14 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 
 	public GameProfile getSelectedProfile() {
 		return this.selectedProfile;
+	}
+
+	public String getSelectedVersion() {
+		return this.selectedVersion;
+	}
+
+	public void setSelectedVersion(String selectedVersion) {
+		this.selectedVersion = selectedVersion;
 	}
 
 	public String toString() {

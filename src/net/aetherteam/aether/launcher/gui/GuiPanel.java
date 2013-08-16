@@ -12,13 +12,16 @@ import org.lwjgl.opengl.Display;
 
 public class GuiPanel {
 
+	private GuiSettings settings;
+
 	private ArrayList<GuiForm> forms = new ArrayList<GuiForm>();
 
 	private ArrayList<GuiForm> addForms = new ArrayList<GuiForm>();
 
 	private ArrayList<GuiForm> removeForms = new ArrayList<GuiForm>();
 
-	public GuiPanel() {
+	public GuiPanel(GuiSettings settings) {
+		this.settings = settings;
 	}
 
 	public void render() {
@@ -45,12 +48,9 @@ public class GuiPanel {
 				int y = Display.getHeight() - Mouse.getEventY();
 
 				for (GuiForm form : this.forms) {
-					if (form.isFocused()) {
-						for (GuiElement element : form.getElements()) {
-							if (element.containsPoint(x, y)) {
-								element.onMouseClick();
-								form.onElementClick(element);
-							}
+					for (GuiElement element : form.getElements()) {
+						if (element.containsPoint(x, y)) {
+							form.onElementClick(element);
 						}
 					}
 				}
@@ -64,10 +64,8 @@ public class GuiPanel {
 				char character = Keyboard.getEventCharacter();
 
 				for (GuiForm form : this.forms) {
-					if (form.isFocused()) {
-						for (GuiElement element : form.getElements()) {
-							element.onKey(character);
-						}
+					for (GuiElement element : form.getElements()) {
+						element.onKey(character);
 					}
 				}
 			}
@@ -82,19 +80,8 @@ public class GuiPanel {
 		this.removeForms.add(form);
 	}
 
-	public void setOnlyFocus(GuiForm focusForm) {
-		for (GuiForm form : this.forms) {
-			if (form != focusForm) {
-				form.fadeOut(40);
-				form.setFocused(false);
-			}
-		}
-	}
-
-	public void setAllFocus(boolean focus) {
-		for (GuiForm form : this.forms) {
-			form.setFocused(focus);
-		}
+	public GuiSettings getSettings() {
+		return this.settings;
 	}
 
 }

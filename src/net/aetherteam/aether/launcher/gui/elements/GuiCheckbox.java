@@ -33,4 +33,8 @@ public class GuiCheckbox extends GuiRectangle {
 		this.isChecked = !this.isChecked;
 	}
 
+	public boolean isChecked() {
+		return this.isChecked;
+	}
+
 }

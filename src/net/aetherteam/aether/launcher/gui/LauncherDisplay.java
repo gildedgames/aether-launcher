@@ -3,7 +3,8 @@ package net.aetherteam.aether.launcher.gui;
 import java.io.IOException;
 
 import net.aetherteam.aether.launcher.Launcher;
-import net.aetherteam.aether.launcher.gui.forms.MainForm;
+import net.aetherteam.aether.launcher.gui.forms.LoginForm;
+import net.aetherteam.aether.launcher.gui.forms.PlayForm;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
 
 import org.lwjgl.LWJGLException;
@@ -11,6 +12,7 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.openal.SoundStore;
@@ -47,8 +49,22 @@ public class LauncherDisplay {
 			e.printStackTrace();
 		}
 
-		this.panel = new GuiPanel();
-		new MainForm(this.panel, null);
+		GuiSettings settings = new GuiSettings();
+
+		settings.backgroundColor = new Color(0, 0, 0, 0.2F);
+		settings.textFieldColor = new Color(0, 0, 0, 0.3F);
+		settings.textFieldHoveredColor = new Color(0, 0, 0, 0.5F);
+		settings.fadeSpeed = 40;
+
+		this.panel = new GuiPanel(settings);
+
+		boolean isLoggedIn = Launcher.getInstance().getProfileManager().getAuthenticationService().isLoggedIn();
+
+		if (isLoggedIn) {
+			new PlayForm(this.panel, null);
+		} else {
+			new LoginForm(this.panel, null);
+		}
 
 		//this.music.playAsMusic(1.0f, 0.5f, true);
 	}

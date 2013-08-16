@@ -58,13 +58,10 @@ public class Launcher {
 
 		try {
 			auth.logIn();
+			this.profileManager.saveProfile();
 		} catch (AuthenticationException e) {
-			e.printStackTrace();
+			this.println("Invalid creditentials");
 		}
-
-		this.profileManager.saveProfile();
-
-		this.gameLauncher.playGame();
 	}
 
 	public void println(String string) {

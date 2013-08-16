@@ -134,6 +134,32 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		return this.profiles;
 	}
 
+	public String[] getAvailableProfileNames() {
+		if (this.profiles == null) {
+			return new String[] { this.getSelectedProfile().getName() };
+		}
+
+		String[] profileNames = new String[this.profiles.length];
+
+		for (int i = 0; i < profileNames.length; ++i) {
+			profileNames[i] = this.profiles[i].getName();
+		}
+
+		return profileNames;
+	}
+
+	public void selectGameProfile(String selectProfile) {
+		if (this.profiles == null) {
+			return;
+		}
+
+		for (GameProfile profile : this.profiles) {
+			if (profile.equals(selectProfile)) {
+				this.setSelectedProfile(profile);
+			}
+		}
+	}
+
 	public boolean isLoggedIn() {
 		return StringUtils.isNotBlank(this.accessToken);
 	}
@@ -150,6 +176,7 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 
 	public Map<String, String> saveForStorage() {
 		Map<String, String> result = super.saveForStorage();
+
 		if (!this.shouldRememberMe()) {
 			return result;
 		}

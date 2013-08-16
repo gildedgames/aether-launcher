@@ -19,19 +19,17 @@ public abstract class GuiForm {
 
 	protected GuiForm parentForm;
 
-	protected boolean isFocused;
-
-	private int fadingState;
+	private int fadeToDo;
 
 	private float fade;
 
 	private int fadeX;
 
+	protected boolean kill;
+
 	public GuiForm(GuiPanel panel, GuiForm parentForm) {
 		this.panel = panel;
 		this.parentForm = parentForm;
-		this.isFocused = true;
-		this.fade = 1;
 		this.fadeX = 0;
 
 		this.panel.add(this);
@@ -44,20 +42,31 @@ public abstract class GuiForm {
 		this.elements.removeAll(this.removeElements);
 		this.removeElements.clear();
 
-		if (this.fadingState != 0) {
-			this.fadeX -= Math.abs(this.fadingState);
-			this.fade += (float) this.fadingState / Display.getWidth();
+		this.fade = 1.0F - Math.abs(this.fadeX / (float) Display.getWidth());
 
-			if (this.fade > 1) {
-				this.fade = 1;
-				this.fadeX = 0;
-				this.fadingState = 0;
+		if (this.fadeToDo < 0) {
+			this.fadeX -= this.panel.getSettings().fadeSpeed;
+			this.fadeToDo += this.panel.getSettings().fadeSpeed;
+
+			if (this.fadeToDo >= 0) {
+				this.fadeX += this.fadeToDo;
+				this.fadeToDo = 0;
+
+				if (this.kill && (this.fadeX < 0)) {
+					this.panel.remove(this);
+				}
 			}
+		} else if (this.fadeToDo > 0) {
+			this.fadeX += this.panel.getSettings().fadeSpeed;
+			this.fadeToDo -= this.panel.getSettings().fadeSpeed;
 
-			if (this.fade < 0) {
-				this.fade = 0;
-				this.fadeX = Display.getWidth();
-				this.fadingState = 0;
+			if (this.fadeToDo <= 0) {
+				this.fadeX += this.fadeToDo;
+				this.fadeToDo = 0;
+
+				if (this.kill && (this.fadeX > 0)) {
+					this.panel.remove(this);
+				}
 			}
 		}
 
@@ -68,7 +77,9 @@ public abstract class GuiForm {
 		}
 	}
 
-	public abstract void onElementClick(GuiElement element);
+	public void onElementClick(GuiElement element) {
+		element.onMouseClick();
+	}
 
 	public void add(GuiElement element) {
 		this.addElements.add(element);
@@ -82,31 +93,24 @@ public abstract class GuiForm {
 		return this.elements;
 	}
 
-	public boolean isFocused() {
-		return this.isFocused;
-	}
-
-	public void setFocused(boolean isFocused) {
-		this.isFocused = isFocused;
-	}
-
 	public int getFadeX() {
 		return this.fadeX;
+	}
+
+	public void setFadeX(int fadeX) {
+		this.fadeX = fadeX;
 	}
 
 	public float getFade() {
 		return this.fade;
 	}
 
-	public void fadeIn(int speed) {
-		this.fadeX = Display.getWidth();
-		this.fade = 0;
-		this.fadingState = speed;
+	public void fadeLeft() {
+		this.fadeToDo -= Display.getWidth();
 	}
 
-	public void fadeOut(int speed) {
-		this.fadeX = 0;
-		this.fadingState = -speed;
+	public void fadeRight() {
+		this.fadeToDo += Display.getWidth();
 	}
 
 	public GuiPanel getPanel() {
