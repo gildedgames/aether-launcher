@@ -2,6 +2,7 @@ package net.aetherteam.aether.launcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,22 +13,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import net.aetherteam.aether.launcher.download.DownloadJob;
 import net.aetherteam.aether.launcher.download.Downloadable;
+import net.aetherteam.aether.launcher.download.EtagDownloadable;
+import net.aetherteam.aether.launcher.utils.FileUtils;
 import net.aetherteam.aether.launcher.version.CompleteVersion;
+import net.aetherteam.aether.launcher.version.Http;
 import net.aetherteam.aether.launcher.version.LocalVersionList;
 import net.aetherteam.aether.launcher.version.RemoteVersionList;
 import net.aetherteam.aether.launcher.version.Version;
 import net.aetherteam.aether.launcher.version.VersionList;
 import net.aetherteam.aether.launcher.version.VersionSyncInfo;
+import net.aetherteam.aether.launcher.version.assets.AssetDownloadable;
+import net.aetherteam.aether.launcher.version.assets.AssetIndex;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import com.google.gson.Gson;
 
 public class VersionManager {
 
@@ -36,6 +36,8 @@ public class VersionManager {
 	private LocalVersionList localVersionList;
 
 	private RemoteVersionList remoteVersionList;
+
+	private final Gson gson = new Gson();
 
 	public VersionManager(LocalVersionList localVersionList, RemoteVersionList remoteVersionList) {
 		this.localVersionList = localVersionList;
@@ -53,6 +55,7 @@ public class VersionManager {
 		if ((this.localVersionList instanceof LocalVersionList)) {
 			for (Version version : this.remoteVersionList.getVersions()) {
 				String id = version.getId();
+
 				if (this.localVersionList.getVersion(id) != null) {
 					this.localVersionList.removeVersion(id);
 					this.localVersionList.addVersion(this.remoteVersionList.getCompleteVersion(id));
@@ -60,6 +63,8 @@ public class VersionManager {
 				}
 			}
 		}
+
+		this.localVersionList.saveVersionList();
 	}
 
 	public String[] getVersions() {
@@ -145,54 +150,37 @@ public class VersionManager {
 
 		job.addDownloadables(version.getRequiredDownloadables(OperatingSystem.getCurrentPlatform(), proxy, baseDirectory, false));
 
-		String jarFile = "versions/" + version.getId() + "/" + version.getId() + ".jar";
-		job.addDownloadables(new Downloadable[] { new Downloadable(proxy, new URL("https://s3.amazonaws.com/Minecraft.Download/" + jarFile), new File(baseDirectory, jarFile), false) });
+		String jarFile = "versions/" + version.getMinecraftVersion() + "/" + version.getMinecraftVersion() + ".jar";
+		job.addDownloadables(new Downloadable[] { new EtagDownloadable(proxy, new URL("https://s3.amazonaws.com/Minecraft.Download/" + jarFile), new File(baseDirectory, jarFile), false) });
 
 		return job;
 	}
 
 	public Set<Downloadable> getResourceFiles(Proxy proxy, File baseDirectory) {
-		Set<Downloadable> result = new HashSet<Downloadable>();
+		Set result = new HashSet();
+		InputStream inputStream = null;
+		File assets = new File(baseDirectory, "assets");
+		File objectsFolder = new File(assets, "objects");
+		File indexesFolder = new File(assets, "indexes");
+		String indexName = null;//version.getAssets();
+		long start = System.nanoTime();
 
+		if (indexName == null) {
+			indexName = "legacy";
+		}
+		File indexFile = new File(indexesFolder, indexName + ".json");
 		try {
-			URL resourceUrl = new URL("https://s3.amazonaws.com/Minecraft.Resources/");
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(resourceUrl.openStream());
-			NodeList nodeLst = doc.getElementsByTagName("Contents");
+			String json = Http.performGet(new URL("https://s3.amazonaws.com/Minecraft.Download/indexes/" + indexName + ".json"), proxy);
+			FileUtils.writeStringToFile(indexFile, json);
+			AssetIndex index = this.gson.fromJson(json, AssetIndex.class);
 
-			long start = System.nanoTime();
-
-			for (int i = 0; i < nodeLst.getLength(); i++) {
-				Node node = nodeLst.item(i);
-
-				if (node.getNodeType() == 1) {
-					Element element = (Element) node;
-					String key = element.getElementsByTagName("Key").item(0).getChildNodes().item(0).getNodeValue();
-					String etag = element.getElementsByTagName("ETag") != null ? element.getElementsByTagName("ETag").item(0).getChildNodes().item(0).getNodeValue() : "-";
-
-					long size = Long.parseLong(element.getElementsByTagName("Size").item(0).getChildNodes().item(0).getNodeValue());
-
-					if (size > 0L) {
-						File file = new File(baseDirectory, "assets/" + key);
-
-						if (etag.length() > 1) {
-							etag = Downloadable.getEtag(etag);
-
-							if ((file.isFile()) && (file.length() == size)) {
-								String localMd5 = Downloadable.getMD5(file);
-
-								if (localMd5.equals(etag)) {
-									continue;
-								}
-							}
-						}
-
-						Downloadable downloadable = new Downloadable(proxy, new URL("https://s3.amazonaws.com/Minecraft.Resources/" + key), file, false);
-						downloadable.setExpectedSize(size);
-
-						result.add(downloadable);
-					}
+			for (AssetIndex.AssetObject object : index.getUniqueObjects()) {
+				String filename = object.getHash().substring(0, 2) + "/" + object.getHash();
+				File file = new File(objectsFolder, filename);
+				if ((!file.isFile()) || (file.length() != object.getSize())) {
+					Downloadable downloadable = new AssetDownloadable(proxy, new URL("http://resources.download.minecraft.net/" + filename), file, false, object.getHash(), object.getSize());
+					downloadable.setExpectedSize(object.getSize());
+					result.add(downloadable);
 				}
 			}
 
@@ -201,6 +189,15 @@ public class VersionManager {
 			Launcher.getInstance().println("Delta time to compare resources: " + (delta / 1000000L) + " ms ");
 		} catch (Exception ex) {
 			Launcher.getInstance().println("Couldn't download resources", ex);
+		} finally {
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		return result;

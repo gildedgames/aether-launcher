@@ -61,11 +61,12 @@ public class GuiPanel {
 	private void processKeyEvents() {
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
+				int key = Keyboard.getEventKey();
 				char character = Keyboard.getEventCharacter();
 
 				for (GuiForm form : this.forms) {
 					for (GuiElement element : form.getElements()) {
-						element.onKey(character);
+						element.onKey(key, character);
 					}
 				}
 			}

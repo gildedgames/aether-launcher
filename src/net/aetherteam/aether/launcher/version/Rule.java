@@ -19,6 +19,7 @@ public class Rule {
 		return this.action;
 	}
 
+	@Override
 	public String toString() {
 		return "Rule{action=" + this.action + ", os=" + this.os + '}';
 	}
@@ -54,6 +55,7 @@ public class Rule {
 			return true;
 		}
 
+		@Override
 		public String toString() {
 			return "OSRestriction{name=" + this.name + ", version='" + this.version + '\'' + '}';
 		}

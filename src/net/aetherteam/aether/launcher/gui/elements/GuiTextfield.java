@@ -2,6 +2,7 @@ package net.aetherteam.aether.launcher.gui.elements;
 
 import net.aetherteam.aether.launcher.gui.forms.GuiForm;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class GuiTextfield extends GuiElement {
@@ -51,9 +52,9 @@ public class GuiTextfield extends GuiElement {
 	}
 
 	@Override
-	public void onKey(char character) {
+	public void onKey(int key, char character) {
 		if (GuiTextfield.activeTextfield == this) {
-			if (character == 127) {
+			if (key == Keyboard.KEY_BACK) {
 				if (this.text.getString().length() > 0) {
 					this.text.setText(this.text.getString().substring(0, this.text.getString().length() - 1));
 					this.realText = this.realText.substring(0, this.realText.length() - 1);

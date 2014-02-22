@@ -124,6 +124,7 @@ public class Library {
 		return String.format("%s-%s-%s.jar", new Object[] { parts[1], parts[2], classifier });
 	}
 
+	@Override
 	public String toString() {
 		return "Library{name='" + this.name + '\'' + ", rules=" + this.rules + ", natives=" + this.natives + ", extract=" + this.extract + '}';
 	}
@@ -137,6 +138,6 @@ public class Library {
 			return this.url;
 		}
 
-		return "https://s3.amazonaws.com/Minecraft.Download/libraries/";
+		return "https://libraries.minecraft.net/";
 	}
 }

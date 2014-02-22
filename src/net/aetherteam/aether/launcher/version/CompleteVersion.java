@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.aetherteam.aether.launcher.OperatingSystem;
+import net.aetherteam.aether.launcher.download.ChecksummedDownloadable;
 import net.aetherteam.aether.launcher.download.Downloadable;
 
 public class CompleteVersion implements Version {
@@ -22,6 +23,10 @@ public class CompleteVersion implements Version {
 	private Date time;
 
 	private Date releaseTime;
+
+	private List<String> changelog;
+
+	private String minecraftVersion;
 
 	private String minecraftArguments;
 
@@ -40,7 +45,7 @@ public class CompleteVersion implements Version {
 	public CompleteVersion() {
 	}
 
-	public CompleteVersion(String id, Date releaseTime, Date updateTime, String mainClass, String minecraftArguments) {
+	public CompleteVersion(String id, Date releaseTime, List<String> changelog, Date updateTime, String mainClass, String minecraftArguments) {
 		if ((id == null) || (id.length() == 0)) {
 			throw new IllegalArgumentException("ID cannot be null or empty");
 		}
@@ -63,6 +68,7 @@ public class CompleteVersion implements Version {
 
 		this.id = id;
 		this.releaseTime = releaseTime;
+		this.changelog = changelog;
 		this.time = updateTime;
 		this.mainClass = mainClass;
 		this.libraries = new ArrayList<Library>();
@@ -71,23 +77,35 @@ public class CompleteVersion implements Version {
 	}
 
 	public CompleteVersion(CompleteVersion version) {
-		this(version.getId(), version.getReleaseTime(), version.getUpdatedTime(), version.getMainClass(), version.getMinecraftArguments());
+		this(version.getId(), version.getReleaseTime(), version.getChangelog(), version.getUpdatedTime(), version.getMainClass(), version.getMinecraftArguments());
 	}
 
 	public CompleteVersion(Version version, String mainClass, String minecraftArguments) {
-		this(version.getId(), version.getReleaseTime(), version.getUpdatedTime(), mainClass, minecraftArguments);
+		this(version.getId(), version.getReleaseTime(), version.getChangelog(), version.getUpdatedTime(), mainClass, minecraftArguments);
 	}
 
+	@Override
 	public String getId() {
 		return this.id;
 	}
 
+	@Override
 	public Date getUpdatedTime() {
 		return this.time;
 	}
 
+	@Override
 	public Date getReleaseTime() {
 		return this.releaseTime;
+	}
+
+	@Override
+	public List<String> getChangelog() {
+		return this.changelog;
+	}
+
+	public String getMinecraftVersion() {
+		return this.minecraftVersion;
 	}
 
 	public Collection<Library> getLibraries() {
@@ -102,6 +120,7 @@ public class CompleteVersion implements Version {
 		return this.mainClass;
 	}
 
+	@Override
 	public void setUpdatedTime(Date time) {
 		if (time == null) {
 			throw new IllegalArgumentException("Time cannot be null");
@@ -110,6 +129,7 @@ public class CompleteVersion implements Version {
 		this.time = time;
 	}
 
+	@Override
 	public void setReleaseTime(Date time) {
 		if (time == null) {
 			throw new IllegalArgumentException("Time cannot be null");
@@ -148,7 +168,7 @@ public class CompleteVersion implements Version {
 			}
 		}
 
-		result.add(new File(base, "versions/" + this.getId() + "/" + this.getId() + ".jar"));
+		result.add(new File(base, "versions/" + this.getMinecraftVersion() + "/" + this.getMinecraftVersion() + ".jar"));
 
 		return result;
 	}
@@ -211,23 +231,24 @@ public class CompleteVersion implements Version {
 				File local = new File(targetDirectory, "libraries/" + file);
 
 				if ((!local.isFile()) || (!library.hasCustomUrl())) {
-					neededFiles.add(new Downloadable(proxy, url, local, ignoreLocalFiles));
+					neededFiles.add(new ChecksummedDownloadable(proxy, url, local, ignoreLocalFiles));
 				}
 			}
 		}
 
 		for (Mod mod : this.getMods()) {
 			URL url = new URL(mod.getUrl());
-			File local = new File(targetDirectory, mod.getPath());
+			File local = new File(targetDirectory, mod.getVersionPath(this));
 
 			if ((!local.isFile())) {
-				neededFiles.add(new Downloadable(proxy, url, local, ignoreLocalFiles));
+				neededFiles.add(new ChecksummedDownloadable(proxy, url, local, ignoreLocalFiles));
 			}
 		}
 
 		return neededFiles;
 	}
 
+	@Override
 	public String toString() {
 		return "CompleteVersion{id='" + this.id + '\'' + ", time=" + this.time + ", libraries=" + this.libraries + ", mainClass='" + this.mainClass + '\'' + ", minimumLauncherVersion=" + this.minimumLauncherVersion + '}';
 	}

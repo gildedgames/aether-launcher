@@ -1,8 +1,15 @@
 package net.aetherteam.aether.launcher.gui;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import javax.imageio.ImageIO;
 
 import net.aetherteam.aether.launcher.Launcher;
+import net.aetherteam.aether.launcher.gui.forms.AdForm;
 import net.aetherteam.aether.launcher.gui.forms.LoginForm;
 import net.aetherteam.aether.launcher.gui.forms.PlayForm;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
@@ -21,18 +28,63 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class LauncherDisplay {
 
+	public static LauncherDisplay instance;
+
 	private Panorama panorama;
 
 	private Sprite logo;
+
+	public Sprite craftHosting;
+
+	public Sprite facebook;
+
+	public Sprite twitter;
 
 	private Audio music;
 
 	private GuiPanel panel;
 
+	private boolean shouldTerminate;
+
+	public LauncherDisplay() {
+		new Launcher();
+
+		LauncherDisplay.instance = this;
+
+		this.init();
+		this.start();
+	}
+
+	public ByteBuffer loadIcon(String url) {
+		try {
+			BufferedImage bufferedImage = ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream(url)));
+
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+
+			return ByteBuffer.wrap(byteArrayOutputStream.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public void loadIcons() {
+		ByteBuffer[] icons = new ByteBuffer[2];
+
+		icons[0] = this.loadIcon("assets/icon_16.png");
+		icons[1] = this.loadIcon("assets/icon_32.png");
+
+		Display.setIcon(icons);
+	}
+
 	public void init() {
 		try {
-			Display.setTitle("The Aether II");
+			Display.setTitle("Aether II Launcher 1.01");
+			this.loadIcons();
 			Display.setDisplayMode(new DisplayMode(854, 480));
+
 			Display.create();
 			Display.setVSyncEnabled(true);
 		} catch (LWJGLException e) {
@@ -45,6 +97,9 @@ public class LauncherDisplay {
 		try {
 			this.music = AudioLoader.getStreamingAudio("OGG", ResourceLoader.getResource("assets/music.ogg"));
 			this.logo = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/aether_logo.png")));
+			this.craftHosting = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/craftnode.png")));
+			this.facebook = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/facebook.png")));
+			this.twitter = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/twitter.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -66,7 +121,9 @@ public class LauncherDisplay {
 			new LoginForm(this.panel, null);
 		}
 
-		//this.music.playAsMusic(1.0f, 0.5f, true);
+		new AdForm(this.panel, null);
+
+		this.music.playAsMusic(1.0f, 0.5f, true);
 	}
 
 	public void start() {
@@ -91,12 +148,16 @@ public class LauncherDisplay {
 			Display.update();
 			Display.sync(60);
 
-			if (Display.isCloseRequested()) {
+			if (Display.isCloseRequested() || this.shouldTerminate) {
 				Display.destroy();
 				AL.destroy();
 				System.exit(0);
 			}
 		}
+	}
+
+	public void terminate() {
+		this.shouldTerminate = true;
 	}
 
 	public void render() {
@@ -114,11 +175,7 @@ public class LauncherDisplay {
 	}
 
 	public static void main(String[] argv) {
-		new Launcher();
-
-		LauncherDisplay launcherDisplay = new LauncherDisplay();
-		launcherDisplay.init();
-		launcherDisplay.start();
+		new LauncherDisplay();
 	}
 
 }

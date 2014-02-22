@@ -52,6 +52,29 @@ public enum OperatingSystem {
 		return UNKNOWN;
 	}
 
+	public File getWorkingDirectory() {
+		String userHome = System.getProperty("user.home", ".");
+		File workingDirectory;
+		switch (this) {
+		case LINUX:
+			workingDirectory = new File(userHome, ".aether/");
+			break;
+		case WINDOWS:
+			String applicationData = System.getenv("APPDATA");
+			String folder = applicationData != null ? applicationData : userHome;
+
+			workingDirectory = new File(folder, ".aether/");
+			break;
+		case OSX:
+			workingDirectory = new File(userHome, "Library/Application Support/aether");
+			break;
+		default:
+			workingDirectory = new File(userHome, "aether/");
+		}
+
+		return workingDirectory;
+	}
+
 	public static void openLink(URI link) {
 		try {
 			Class<?> desktopClass = Class.forName("java.awt.Desktop");

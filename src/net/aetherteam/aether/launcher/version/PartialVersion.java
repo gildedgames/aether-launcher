@@ -1,6 +1,7 @@
 package net.aetherteam.aether.launcher.version;
 
 import java.util.Date;
+import java.util.List;
 
 public class PartialVersion implements Version {
 
@@ -9,6 +10,8 @@ public class PartialVersion implements Version {
 	private Date time;
 
 	private Date releaseTime;
+
+	private List<String> changelog;
 
 	public PartialVersion() {
 	}
@@ -32,14 +35,17 @@ public class PartialVersion implements Version {
 		this(version.getId(), version.getReleaseTime(), version.getUpdatedTime());
 	}
 
+	@Override
 	public String getId() {
 		return this.id;
 	}
 
+	@Override
 	public Date getUpdatedTime() {
 		return this.time;
 	}
 
+	@Override
 	public void setUpdatedTime(Date time) {
 		if (time == null) {
 			throw new IllegalArgumentException("Time cannot be null");
@@ -47,10 +53,12 @@ public class PartialVersion implements Version {
 		this.time = time;
 	}
 
+	@Override
 	public Date getReleaseTime() {
 		return this.releaseTime;
 	}
 
+	@Override
 	public void setReleaseTime(Date time) {
 		if (time == null) {
 			throw new IllegalArgumentException("Time cannot be null");
@@ -58,6 +66,12 @@ public class PartialVersion implements Version {
 		this.releaseTime = time;
 	}
 
+	@Override
+	public List<String> getChangelog() {
+		return this.changelog;
+	}
+
+	@Override
 	public String toString() {
 		return "PartialVersion{id='" + this.id + '\'' + ", updateTime=" + this.time + ", releaseTime=" + this.releaseTime + '}';
 	}

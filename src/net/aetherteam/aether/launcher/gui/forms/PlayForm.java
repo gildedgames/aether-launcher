@@ -28,6 +28,8 @@ public class PlayForm extends GuiForm {
 
 	private GuiButton logoutButton;
 
+	private PatchNotesForm patchNotes;
+
 	public PlayForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
@@ -40,16 +42,24 @@ public class PlayForm extends GuiForm {
 
 		this.selectProfileLabel = new GuiText(this, ssfont, "Select profile:");
 
-		int profilesW = 120;
-		this.profiles = new GuiDropdown(this, (Display.getWidth() - profilesW) / 2, this.background.getY() + 25 + 20, profilesW, 35, font, Launcher.getInstance().getProfileManager().getAuthenticationService().getAvailableProfileNames());
+		int profilesW = 210;
+		this.profiles = new GuiDropdown(this, (Display.getWidth() - profilesW) / 2, this.background.getY() + 25 + 20, profilesW, 30, font, Launcher.getInstance().getProfileManager().getAuthenticationService().getAvailableProfileNames());
 		this.profiles.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.profiles);
 
 		this.selectVersionLabel = new GuiText(this, ssfont, "Select version:");
 
-		int versionsW = 120;
-		this.versions = new GuiDropdown(this, (Display.getWidth() - versionsW) / 2, this.background.getY() + 75 + 25 + 15, versionsW, 35, font, Launcher.getInstance().getVersionManager().getVersions());
+		int versionsW = 210;
+		this.versions = new GuiDropdown(this, (Display.getWidth() - versionsW) / 2, this.background.getY() + 75 + 25 + 15, versionsW, 30, font, Launcher.getInstance().getVersionManager().getVersions());
 		this.versions.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
+
+		if (Launcher.getInstance().getProfileManager().getAuthenticationService().getSelectedVersion() != null) {
+			this.versions.setSelected(Launcher.getInstance().getProfileManager().getAuthenticationService().getSelectedVersion());
+		} else {
+			String[] versions = Launcher.getInstance().getVersionManager().getVersions();
+			this.versions.setSelected(versions[versions.length - 1]);
+		}
+
 		this.add(this.versions);
 
 		GuiText play = new GuiText(this, font, "Play");
@@ -61,6 +71,9 @@ public class PlayForm extends GuiForm {
 		this.logoutButton = new GuiButton(this, (Display.getWidth() - 100) / 2, 387, 100, 35, logoutText);
 		this.logoutButton.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.logoutButton);
+
+		this.patchNotes = new PatchNotesForm(this.panel, null);
+		this.patchNotes.setFade(0);
 	}
 
 	@Override
@@ -69,17 +82,31 @@ public class PlayForm extends GuiForm {
 
 		this.selectProfileLabel.render((Display.getWidth() - this.selectProfileLabel.getWidth()) / 2, this.background.getY() + 15);
 		this.selectVersionLabel.render((Display.getWidth() - this.selectVersionLabel.getWidth()) / 2, this.background.getY() + 85);
+
+		if (this.versions.isMouseHovering()) {
+			this.patchNotes.setVersion(this.versions.getText().getString());
+
+			if (this.patchNotes.getFade() < 1.F) {
+				this.patchNotes.setFade(this.patchNotes.getFade() + 0.05F);
+
+				if (this.patchNotes.getFade() > 1.F) {
+					this.patchNotes.setFade(1.F);
+				}
+			}
+		} else if (this.patchNotes.getFade() > 0.F) {
+			this.patchNotes.setFade(this.patchNotes.getFade() - 0.05F);
+
+			if (this.patchNotes.getFade() < 0.F) {
+				this.patchNotes.setFade(0.F);
+			}
+		}
 	}
 
 	@Override
 	public void onElementClick(GuiElement element) {
 		super.onElementClick(element);
 
-		this.versions.onElementClick(element);
-
-		if (element == this.versions) {
-			Launcher.getInstance().getProfileManager().getAuthenticationService().setSelectedVersion(this.versions.getSelectedElement());
-		} else if (element == this.logoutButton) {
+		if (element == this.logoutButton) {
 			Launcher.getInstance().getProfileManager().getAuthenticationService().logOut();
 
 			LoginForm loginForm = new LoginForm(this.panel, null);
@@ -90,6 +117,8 @@ public class PlayForm extends GuiForm {
 			this.fadeRight();
 			this.kill = true;
 		} else if (element == this.playButton) {
+			Launcher.getInstance().getProfileManager().getAuthenticationService().setSelectedVersion(this.versions.getText().getString());
+
 			LoadingForm loadingForm = new LoadingForm(this.panel, null);
 			loadingForm.setFadeX(Display.getWidth());
 			loadingForm.fadeLeft();

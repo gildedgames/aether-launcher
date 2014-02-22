@@ -72,6 +72,7 @@ public class JavaProcess {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return "JavaProcess[commands=" + this.commands + ", isRunning=" + this.isRunning() + "]";
 	}

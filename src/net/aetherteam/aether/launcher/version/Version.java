@@ -1,6 +1,7 @@
 package net.aetherteam.aether.launcher.version;
 
 import java.util.Date;
+import java.util.List;
 
 public interface Version {
 
@@ -13,5 +14,7 @@ public interface Version {
 	public abstract Date getReleaseTime();
 
 	public abstract void setReleaseTime(Date paramDate);
+
+	public abstract List<String> getChangelog();
 
 }

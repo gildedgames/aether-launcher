@@ -19,6 +19,7 @@ public class GameProfile {
 		return this.name;
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -39,12 +40,14 @@ public class GameProfile {
 		return true;
 	}
 
+	@Override
 	public int hashCode() {
 		int result = this.id.hashCode();
 		result = (31 * result) + this.name.hashCode();
 		return result;
 	}
 
+	@Override
 	public String toString() {
 		return "GameProfile{id='" + this.id + '\'' + ", name='" + this.name + '\'' + '}';
 	}

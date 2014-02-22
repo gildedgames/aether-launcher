@@ -16,6 +16,7 @@ public class ProcessMonitorThread extends Thread {
 		this.process = process;
 	}
 
+	@Override
 	public void run() {
 		InputStreamReader reader = new InputStreamReader(this.process.getRawProcess().getInputStream());
 		BufferedReader buf = new BufferedReader(reader);

@@ -99,6 +99,7 @@ public class DownloadJob {
 			for (int i = 0; i < threads; i++) {
 				executorService.submit(new Runnable() {
 
+					@Override
 					public void run() {
 						DownloadJob.this.popAndDownload();
 					}
@@ -121,6 +122,12 @@ public class DownloadJob {
 					this.successful.add(downloadable);
 					Launcher.getInstance().println("Finished downloading " + downloadable.getTarget() + " for job '" + this.name + "'" + ": " + result);
 				} catch (Throwable t) {
+					try {
+						throw t;
+					} catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					Launcher.getInstance().println("Couldn't download " + downloadable.getUrl() + " for job '" + this.name + "'", t);
 					this.remainingFiles.add(downloadable);
 				}

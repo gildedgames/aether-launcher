@@ -3,7 +3,6 @@ package net.aetherteam.aether.launcher.download;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +14,9 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Downloadable {
+import net.aetherteam.aether.launcher.Launcher;
+
+public abstract class Downloadable {
 
 	private final URL url;
 
@@ -27,7 +28,7 @@ public class Downloadable {
 
 	private final ProgressContainer monitor;
 
-	private int numAttempts;
+	protected int numAttempts;
 
 	private long expectedSize;
 
@@ -51,74 +52,45 @@ public class Downloadable {
 		this.expectedSize = expectedSize;
 	}
 
-	public String download() throws IOException {
-		String localMd5 = null;
-		this.numAttempts += 1;
-
-		if ((this.target.getParentFile() != null) && (!this.target.getParentFile().isDirectory())) {
-			this.target.getParentFile().mkdirs();
-		}
-		if ((!this.forceDownload) && (this.target.isFile())) {
-			localMd5 = getMD5(this.target);
-		}
-
-		if ((this.target.isFile()) && (!this.target.canWrite())) {
-			throw new RuntimeException("Do not have write permissions for " + this.target + " - aborting!");
-		}
+	public static String getDigest(File file, String algorithm, int hashLength) {
+		DigestInputStream stream = null;
 		try {
-			HttpURLConnection connection = this.makeConnection(localMd5);
-			int status = connection.getResponseCode();
+			stream = new DigestInputStream(new FileInputStream(file), MessageDigest.getInstance(algorithm));
+			byte[] buffer = new byte[65536];
+			int read;
+			do {
+				read = stream.read(buffer);
+			} while (read > 0);
+		} catch (Exception ignored) {
+			return null;
+		} finally {
+			closeSilently(stream);
+		}
 
-			if (status == 304) {
-				return "Used own copy as it matched etag";
-			}
-			if ((status / 100) == 2) {
-				if (this.expectedSize == 0L) {
-					this.monitor.setTotal(connection.getContentLength());
-				} else {
-					this.monitor.setTotal(this.expectedSize);
-				}
+		return String.format("%1$0" + hashLength + "x", new Object[] { new BigInteger(1, stream.getMessageDigest().digest()) });
+	}
 
-				InputStream inputStream = new MonitoringInputStream(connection.getInputStream(), this.monitor);
-				FileOutputStream outputStream = new FileOutputStream(this.target);
-				String md5 = copyAndDigest(inputStream, outputStream);
-				String etag = getEtag(connection);
+	public abstract String download() throws IOException;
 
-				if (etag.contains("-")) {
-					return "Didn't have etag so assuming our copy is good";
-				}
-				if (etag.equalsIgnoreCase(md5)) {
-					return "Downloaded successfully and etag matched";
-				}
-				throw new RuntimeException(String.format("E-tag did not match downloaded MD5 (ETag was %s, downloaded %s)", new Object[] { etag, md5 }));
-			}
-			if (this.target.isFile()) {
-				return "Couldn't connect to server (responded with " + status + ") but have local file, assuming it's good";
-			}
-			throw new RuntimeException("Server responded with " + status);
-		} catch (IOException e) {
-			if (this.target.isFile()) {
-				return "Couldn't connect to server (" + e.getClass().getSimpleName() + ": '" + e.getMessage() + "') but have local file, assuming it's good";
-			}
-			throw e;
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Missing Digest.MD5", e);
+	protected void updateExpectedSize(HttpURLConnection connection) {
+		if (this.expectedSize == 0L) {
+			this.monitor.setTotal(connection.getContentLength());
+			this.setExpectedSize(connection.getContentLength());
+		} else {
+			this.monitor.setTotal(this.expectedSize);
 		}
 	}
 
-	protected HttpURLConnection makeConnection(String localMd5) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) this.url.openConnection(this.proxy);
+	protected HttpURLConnection makeConnection(URL url) throws IOException {
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection(this.proxy);
 
 		connection.setUseCaches(false);
 		connection.setDefaultUseCaches(false);
 		connection.setRequestProperty("Cache-Control", "no-store,max-age=0,no-cache");
 		connection.setRequestProperty("Expires", "0");
 		connection.setRequestProperty("Pragma", "no-cache");
-		if (localMd5 != null) {
-			connection.setRequestProperty("If-None-Match", localMd5);
-		}
-
-		connection.connect();
+		connection.setConnectTimeout(5000);
+		connection.setReadTimeout(30000);
 
 		return connection;
 	}
@@ -143,28 +115,6 @@ public class Downloadable {
 		return this.proxy;
 	}
 
-	public static String getMD5(File file) {
-		DigestInputStream stream = null;
-
-		Object read;
-		try {
-			stream = new DigestInputStream(new FileInputStream(file), MessageDigest.getInstance("MD5"));
-			byte[] ignored = new byte[65536];
-
-			for (int read1 = stream.read(ignored); read1 >= 1; read1 = stream.read(ignored)) {
-				;
-			}
-
-			return String.format("%1$032x", new Object[] { new BigInteger(1, stream.getMessageDigest().digest()) });
-		} catch (Exception var7) {
-			read = null;
-		} finally {
-			closeSilently(stream);
-		}
-
-		return (String) read;
-	}
-
 	public static void closeSilently(Closeable closeable) {
 		if (closeable != null) {
 			try {
@@ -174,8 +124,14 @@ public class Downloadable {
 		}
 	}
 
-	public static String copyAndDigest(InputStream inputStream, OutputStream outputStream) throws IOException, NoSuchAlgorithmException {
-		MessageDigest digest = MessageDigest.getInstance("MD5");
+	public static String copyAndDigest(InputStream inputStream, OutputStream outputStream, String algorithm, int hashLength) throws IOException {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance(algorithm);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("Missing Digest." + algorithm, e);
+		}
+
 		byte[] buffer = new byte[65536];
 		try {
 			int read = inputStream.read(buffer);
@@ -189,20 +145,21 @@ public class Downloadable {
 			closeSilently(outputStream);
 		}
 
-		return String.format("%1$032x", new Object[] { new BigInteger(1, digest.digest()) });
+		return String.format("%1$0" + hashLength + "x", new Object[] { new BigInteger(1, digest.digest()) });
 	}
 
-	public static String getEtag(HttpURLConnection connection) {
-		return getEtag(connection.getHeaderField("ETag"));
-	}
+	protected void ensureFileWritable() {
+		if ((this.target.getParentFile() != null) && (!this.target.getParentFile().isDirectory())) {
+			Launcher.getInstance().println("Making directory " + this.target.getParentFile());
 
-	public static String getEtag(String etag) {
-		if (etag == null) {
-			etag = "-";
-		} else if ((etag.startsWith("\"")) && (etag.endsWith("\""))) {
-			etag = etag.substring(1, etag.length() - 1);
+			if ((!this.target.getParentFile().mkdirs()) && (!this.target.getParentFile().isDirectory())) {
+				throw new RuntimeException("Could not create directory " + this.target.getParentFile());
+			}
+
 		}
 
-		return etag;
+		if ((this.target.isFile()) && (!this.target.canWrite())) {
+			throw new RuntimeException("Do not have write permissions for " + this.target + " - aborting!");
+		}
 	}
 }

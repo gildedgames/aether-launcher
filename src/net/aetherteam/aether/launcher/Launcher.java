@@ -26,7 +26,8 @@ public class Launcher {
 	private UUID clientToken = UUID.randomUUID();
 
 	public Launcher() {
-		this.baseDirectory = new File("/Users/cafaxo/documents/launcher/");
+		//this.baseDirectory = new File("/Users/cafaxo/aetherlauncher_working/");
+		this.baseDirectory = OperatingSystem.getCurrentPlatform().getWorkingDirectory();
 		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy));
 
 		Launcher.instance = this;
@@ -40,6 +41,7 @@ public class Launcher {
 	public void refreshVersions() {
 		this.versionManager.getExecutorService().submit(new Runnable() {
 
+			@Override
 			public void run() {
 				try {
 					Launcher.this.versionManager.refreshVersions();

@@ -4,73 +4,74 @@ import java.awt.Font;
 
 import net.aetherteam.aether.launcher.gui.forms.GuiForm;
 
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 
-public class GuiDropdown extends GuiElement {
+public class GuiDropdown extends GuiButton {
 
-	private GuiButton[] elements;
+	private String[] elements;
 
-	private GuiButton activeElement;
+	private int selectedElement;
 
 	public GuiDropdown(GuiForm form, int x, int y, int width, int height, Font font, String[] elements) {
-		super(form, x, y, width, height);
+		super(form, x, y, width, height, new GuiText(form, font, elements[0]));
 
-		this.elements = new GuiButton[elements.length];
-
-		for (int i = 0; i < elements.length; ++i) {
-			GuiText text = new GuiText(this.form, font, elements[i]);
-			GuiButton button = new GuiButton(this.form, x, y + (this.height * i), width, height, text);
-			this.form.add(button);
-			this.elements[i] = button;
-		}
-
-		this.activeElement = this.elements[0];
-	}
-
-	@Override
-	public void setColor(Color color, Color hoveringColor) {
-		for (GuiButton element : this.elements) {
-			element.setColor(color, hoveringColor);
-		}
+		this.elements = elements;
 	}
 
 	@Override
 	public void render() {
-		boolean isActive = false;
+		super.render();
 
-		this.activeElement.y = this.y;
-		this.activeElement.render();
+		Color arrowColor = new Color(0, 0, 0, 0.3F);
+		Color hoveringArrowColor = new Color(0, 0, 0, 0.6F);
 
-		for (GuiButton element : this.elements) {
-			if (element.isMouseHovering()) {
-				isActive = true;
-				break;
+		Color leftArrowColor = null;
+		Color rightArrowColor = null;
+
+		if (this.isMouseHovering()) {
+			if (Mouse.getX() < (this.getFadingX() + (this.width / 2))) {
+				leftArrowColor = hoveringArrowColor;
+				rightArrowColor = arrowColor;
+			} else {
+				leftArrowColor = arrowColor;
+				rightArrowColor = hoveringArrowColor;
 			}
+		} else {
+			leftArrowColor = arrowColor;
+			rightArrowColor = arrowColor;
 		}
 
-		int y = this.y + this.height;
+		GuiElement.renderArrow(this.getFadingX() + 5, this.y + 5, this.height - 20, this.height - 10, leftArrowColor, true);
+		GuiElement.renderArrow(((this.getFadingX() + this.width) - this.height) + 15, this.y + 5, this.height - 20, this.height - 10, rightArrowColor, false);
+	}
 
-		for (GuiButton element2 : this.elements) {
-			GuiButton element = element2;
-
-			if (element != this.activeElement) {
-				element.y = y;
-				element.shouldRender = isActive;
-
-				y += this.height;
+	@Override
+	public void onMouseClick() {
+		if (Mouse.getX() < (this.getFadingX() + (this.width / 2))) {
+			if (this.selectedElement == 0) {
+				return;
 			}
+
+			this.selectedElement--;
+
+			this.text.setText(this.elements[this.selectedElement]);
+		} else {
+			if (this.selectedElement == (this.elements.length - 1)) {
+				return;
+			}
+
+			this.selectedElement++;
+			this.text.setText(this.elements[this.selectedElement]);
 		}
 	}
 
-	public void onElementClick(GuiElement clickedElement) {
-		for (GuiButton element : this.elements) {
-			if (element == clickedElement) {
-				this.activeElement = (GuiButton) clickedElement;
+	public void setSelected(String selected) {
+		for (int i = 0; i < this.elements.length; ++i) {
+			if (selected.equals(this.elements[i])) {
+				this.selectedElement = i;
+				this.text.setText(this.elements[this.selectedElement]);
 			}
 		}
-	}
-
-	public String getSelectedElement() {
-		return this.activeElement.getText().getString();
 	}
 }

@@ -84,11 +84,10 @@ public class LoginForm extends GuiForm {
 		super.onElementClick(element);
 
 		if (element == this.loginButton) {
+			Launcher.getInstance().getProfileManager().getAuthenticationService().setRememberMe(this.rememberCheckbox.isChecked());
 			Launcher.getInstance().login(this.usernameField.getText(), this.passwordField.getText());
 
 			if (Launcher.getInstance().getProfileManager().getAuthenticationService().isLoggedIn()) {
-				Launcher.getInstance().getProfileManager().getAuthenticationService().setRememberMe(this.rememberCheckbox.isChecked());
-
 				PlayForm playForm = new PlayForm(this.panel, this);
 				playForm.setFadeX(Display.getWidth());
 				playForm.fadeLeft();

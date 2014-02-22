@@ -4,7 +4,7 @@ import net.aetherteam.aether.launcher.gui.forms.GuiForm;
 
 public class GuiButton extends GuiRectangle {
 
-	private GuiText text;
+	protected GuiText text;
 
 	public GuiButton(GuiForm form, int x, int y, int width, int height, GuiText text) {
 		super(form, x, y, width, height);
@@ -12,6 +12,7 @@ public class GuiButton extends GuiRectangle {
 		this.text = text;
 	}
 
+	@Override
 	public void render() {
 		super.render();
 

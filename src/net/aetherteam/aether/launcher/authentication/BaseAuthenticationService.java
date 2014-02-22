@@ -30,23 +30,28 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 
 	private String selectedVersion;
 
+	@Override
 	public boolean canLogIn() {
 		return (!this.canPlayOnline()) && (StringUtils.isNotBlank(this.getUsername())) && (StringUtils.isNotBlank(this.getPassword()));
 	}
 
+	@Override
 	public void logOut() {
 		this.password = null;
 		this.setSelectedProfile(null);
 	}
 
+	@Override
 	public boolean isLoggedIn() {
 		return this.getSelectedProfile() != null;
 	}
 
+	@Override
 	public boolean canPlayOnline() {
 		return (this.isLoggedIn()) && (this.getSelectedProfile() != null) && (this.getSessionToken() != null);
 	}
 
+	@Override
 	public void setUsername(String username) {
 		if ((this.isLoggedIn()) && (this.canPlayOnline())) {
 			throw new IllegalStateException("Cannot change username whilst logged in & online");
@@ -55,6 +60,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		this.username = username;
 	}
 
+	@Override
 	public void setPassword(String password) {
 		if ((this.isLoggedIn()) && (this.canPlayOnline()) && (StringUtils.isNotBlank(password))) {
 			throw new IllegalStateException("Cannot set password whilst logged in & online");
@@ -63,6 +69,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		this.password = password;
 	}
 
+	@Override
 	public String getUsername() {
 		return this.username;
 	}
@@ -71,6 +78,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		return this.password;
 	}
 
+	@Override
 	public void loadFromStorage(Map<String, String> credentials) {
 		this.logOut();
 
@@ -88,6 +96,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		}
 	}
 
+	@Override
 	public Map<String, String> saveForStorage() {
 		Map<String, String> result = new HashMap<String, String>();
 
@@ -112,10 +121,12 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		return result;
 	}
 
+	@Override
 	public boolean shouldRememberMe() {
 		return this.shouldRememberMe;
 	}
 
+	@Override
 	public void setRememberMe(boolean rememberMe) {
 		this.shouldRememberMe = rememberMe;
 	}
@@ -124,6 +135,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		this.selectedProfile = selectedProfile;
 	}
 
+	@Override
 	public GameProfile getSelectedProfile() {
 		return this.selectedProfile;
 	}
@@ -136,6 +148,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		this.selectedVersion = selectedVersion;
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
@@ -168,6 +181,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		return result.toString();
 	}
 
+	@Override
 	public String guessPasswordFromSillyOldFormat(File file) {
 		String[] details = getStoredDetails(file);
 

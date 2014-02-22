@@ -16,4 +16,12 @@ public class Mod {
 	public String getUrl() {
 		return this.url;
 	}
+
+	public String getName() {
+		return this.path.substring(this.path.lastIndexOf("/"), this.path.length());
+	}
+
+	public String getVersionPath(Version version) {
+		return "versions/" + version.getId() + "/" + this.getName();
+	}
 }

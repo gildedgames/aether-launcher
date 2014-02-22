@@ -31,6 +31,7 @@ public abstract class GuiForm {
 		this.panel = panel;
 		this.parentForm = parentForm;
 		this.fadeX = 0;
+		this.fade = 1.F;
 
 		this.panel.add(this);
 	}
@@ -41,8 +42,6 @@ public abstract class GuiForm {
 
 		this.elements.removeAll(this.removeElements);
 		this.removeElements.clear();
-
-		this.fade = 1.0F - Math.abs(this.fadeX / (float) Display.getWidth());
 
 		if (this.fadeToDo < 0) {
 			this.fadeX -= this.panel.getSettings().fadeSpeed;
@@ -56,6 +55,8 @@ public abstract class GuiForm {
 					this.panel.remove(this);
 				}
 			}
+
+			this.fade = 1.0F - Math.abs(this.fadeX / (float) Display.getWidth());
 		} else if (this.fadeToDo > 0) {
 			this.fadeX += this.panel.getSettings().fadeSpeed;
 			this.fadeToDo -= this.panel.getSettings().fadeSpeed;
@@ -68,6 +69,8 @@ public abstract class GuiForm {
 					this.panel.remove(this);
 				}
 			}
+
+			this.fade = 1.0F - Math.abs(this.fadeX / (float) Display.getWidth());
 		}
 
 		for (GuiElement element : this.elements) {
@@ -103,6 +106,10 @@ public abstract class GuiForm {
 
 	public float getFade() {
 		return this.fade;
+	}
+
+	public void setFade(float fade) {
+		this.fade = fade;
 	}
 
 	public void fadeLeft() {

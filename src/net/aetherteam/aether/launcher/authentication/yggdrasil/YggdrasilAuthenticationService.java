@@ -32,10 +32,12 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 
 	private boolean isOnline;
 
+	@Override
 	public boolean canLogIn() {
 		return (!this.canPlayOnline()) && (StringUtils.isNotBlank(this.getUsername())) && ((StringUtils.isNotBlank(this.getPassword())) || (StringUtils.isNotBlank(this.getAccessToken())));
 	}
 
+	@Override
 	public void logIn() throws AuthenticationException {
 		if (StringUtils.isBlank(this.getUsername())) {
 			throw new InvalidCredentialsException("Invalid username");
@@ -122,6 +124,7 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		}
 	}
 
+	@Override
 	public void logOut() {
 		super.logOut();
 
@@ -130,6 +133,7 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		this.isOnline = false;
 	}
 
+	@Override
 	public GameProfile[] getAvailableProfiles() {
 		return this.profiles;
 	}
@@ -160,20 +164,24 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		}
 	}
 
+	@Override
 	public boolean isLoggedIn() {
 		return StringUtils.isNotBlank(this.accessToken);
 	}
 
+	@Override
 	public boolean canPlayOnline() {
 		return (this.isLoggedIn()) && (this.getSelectedProfile() != null) && (this.isOnline);
 	}
 
+	@Override
 	public void loadFromStorage(Map<String, String> credentials) {
 		super.loadFromStorage(credentials);
 
 		this.accessToken = (credentials.get("accessToken"));
 	}
 
+	@Override
 	public Map<String, String> saveForStorage() {
 		Map<String, String> result = super.saveForStorage();
 
@@ -188,6 +196,7 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		return result;
 	}
 
+	@Override
 	public String getSessionToken() {
 		if ((this.isLoggedIn()) && (this.getSelectedProfile() != null) && (this.canPlayOnline())) {
 			return String.format("token:%s:%s", new Object[] { this.getAccessToken(), this.getSelectedProfile().getId() });
@@ -207,6 +216,7 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		return this.agent;
 	}
 
+	@Override
 	public String toString() {
 		return "YggdrasilAuthenticationService{agent=" + this.agent + ", profiles=" + Arrays.toString(this.profiles) + ", selectedProfile=" + this.getSelectedProfile() + ", sessionToken='" + this.getSessionToken() + '\'' + ", username='" + this.getUsername() + '\'' + ", isLoggedIn=" + this.isLoggedIn() + ", canPlayOnline=" + this.canPlayOnline() + ", accessToken='" + this.accessToken + '\'' + ", clientToken='" + this.getClientToken() + '\'' + '}';
 	}

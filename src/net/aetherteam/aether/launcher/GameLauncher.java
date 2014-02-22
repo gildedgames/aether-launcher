@@ -5,6 +5,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -18,23 +20,34 @@ import net.aetherteam.aether.launcher.authentication.AuthenticationService;
 import net.aetherteam.aether.launcher.download.DownloadJob;
 import net.aetherteam.aether.launcher.download.DownloadListener;
 import net.aetherteam.aether.launcher.download.Downloadable;
+import net.aetherteam.aether.launcher.gui.LauncherDisplay;
 import net.aetherteam.aether.launcher.gui.forms.LoadingForm;
 import net.aetherteam.aether.launcher.process.JavaProcess;
 import net.aetherteam.aether.launcher.process.JavaProcessLauncher;
 import net.aetherteam.aether.launcher.process.JavaProcessRunnable;
+import net.aetherteam.aether.launcher.utils.FileUtils;
 import net.aetherteam.aether.launcher.utils.StrSubstitutor;
 import net.aetherteam.aether.launcher.version.CompleteVersion;
 import net.aetherteam.aether.launcher.version.ExtractRules;
 import net.aetherteam.aether.launcher.version.Library;
 import net.aetherteam.aether.launcher.version.LocalVersionList;
+import net.aetherteam.aether.launcher.version.Mod;
 import net.aetherteam.aether.launcher.version.VersionList;
 import net.aetherteam.aether.launcher.version.VersionSyncInfo;
+import net.aetherteam.aether.launcher.version.assets.AssetIndex;
+
+import com.google.gson.Gson;
+import com.google.gson.internal.bind.DateTypeAdapter;
 
 public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runnable {
 
 	private CompleteVersion version;
 
 	private File nativeDir;
+
+	private final Gson gson = new Gson();
+
+	private final DateTypeAdapter dateAdapter = new DateTypeAdapter();
 
 	public void playGame() {
 		Thread thread = new Thread(this);
@@ -100,6 +113,28 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 	}
 
 	protected void launchGame() {
+		Launcher.getInstance().println("Copying mods");
+
+		for (Mod mod : this.version.getMods()) {
+			File source = new File(Launcher.instance.getBaseDirectory(), mod.getVersionPath(this.version));
+			File target = new File(Launcher.instance.getBaseDirectory(), mod.getPath());
+
+			try {
+				target.getParentFile().mkdirs();
+				target.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+			Launcher.getInstance().println("Copying " + source.toString() + " to " + target.toString());
+
+			try {
+				Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		Launcher.getInstance().println("Launching game");
 
 		if (this.version == null) {
@@ -107,7 +142,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			return;
 		}
 
-		this.nativeDir = new File(Launcher.getInstance().getBaseDirectory(), "versions/" + this.version.getId() + "/" + this.version.getId() + "-natives-" + System.nanoTime());
+		this.nativeDir = new File(Launcher.getInstance().getBaseDirectory(), "versions/" + this.version.getMinecraftVersion() + "/" + this.version.getMinecraftVersion() + "-natives");
 		if (!this.nativeDir.isDirectory()) {
 			this.nativeDir.mkdirs();
 		}
@@ -115,6 +150,15 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		try {
 			this.unpackNatives(this.version, this.nativeDir);
 		} catch (IOException e) {
+			Launcher.getInstance().println("Couldn't unpack natives!", e);
+			return;
+		}
+
+		File assetsDir;
+		try {
+			assetsDir = this.reconstructAssets();
+		} catch (IOException e) {
+			e.printStackTrace();
 			Launcher.getInstance().println("Couldn't unpack natives!", e);
 			return;
 		}
@@ -134,10 +178,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		JavaProcessLauncher processLauncher = new JavaProcessLauncher(null, new String[0]);
 		processLauncher.directory(gameDirectory);
 
-		File assetsDirectory = new File(Launcher.getInstance().getBaseDirectory(), "assets");
-
 		if (OperatingSystem.getCurrentPlatform().equals(OperatingSystem.OSX)) {
-			processLauncher.addCommands(new String[] { "-Xdock:icon=" + new File(assetsDirectory, "icons/minecraft.icns").getAbsolutePath(), "-Xdock:name=Minecraft" });
+			processLauncher.addCommands(new String[] { "-Xdock:icon=" + new File(assetsDir, "icons/minecraft.icns").getAbsolutePath(), "-Xdock:name=Minecraft" });
 		}
 
 		boolean is32Bit = "32".equals(System.getProperty("sun.arch.data.model"));
@@ -150,7 +192,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 		AuthenticationService auth = Launcher.getInstance().getProfileManager().getAuthenticationService();
 
-		String[] args = this.getMinecraftArguments(this.version, auth.getSelectedProfile().getName(), gameDirectory, assetsDirectory, auth);
+		String[] args = this.getMinecraftArguments(this.version, auth.getSelectedProfile().getName(), gameDirectory, assetsDir, auth);
 
 		processLauncher.addCommands(args);
 
@@ -179,6 +221,9 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			Launcher.getInstance().println("Couldn't launch game", e);
 			return;
 		}
+
+		Launcher.instance.getProfileManager().saveProfile();
+		LauncherDisplay.instance.terminate();
 	}
 
 	private String[] getMinecraftArguments(CompleteVersion version, String player, File gameDirectory, File assetsDirectory, AuthenticationService authentication) {
@@ -203,7 +248,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		}
 
 		map.put("profile_name", player);
-		map.put("version_name", version.getId());
+		map.put("version_name", version.getMinecraftVersion());
 
 		map.put("game_directory", gameDirectory.getAbsolutePath());
 		map.put("game_assets", assetsDirectory.getAbsolutePath());
@@ -213,6 +258,44 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		}
 
 		return split;
+	}
+
+	private File reconstructAssets() throws IOException {
+		File assetsDir = new File(Launcher.instance.getBaseDirectory(), "assets");
+		File indexDir = new File(assetsDir, "indexes");
+		File objectDir = new File(assetsDir, "objects");
+		String assetVersion = "legacy";//this.version.getAssets() == null ? "legacy" : this.version.getAssets();
+		File indexFile = new File(indexDir, assetVersion + ".json");
+		File virtualRoot = new File(new File(assetsDir, "virtual"), assetVersion);
+
+		if (!virtualRoot.exists()) {
+			assetsDir.mkdirs();
+		}
+
+		if (!indexFile.isFile()) {
+			Launcher.getInstance().println("No assets index file " + virtualRoot + "; can't reconstruct assets");
+			return virtualRoot;
+		}
+
+		AssetIndex index = this.gson.fromJson(FileUtils.readFileToString(indexFile), AssetIndex.class);
+
+		if (index.isVirtual()) {
+			Launcher.getInstance().println("Reconstructing virtual assets folder at " + virtualRoot);
+			for (Map.Entry entry : index.getFileMap().entrySet()) {
+				File target = new File(virtualRoot, (String) entry.getKey());
+				File original = new File(new File(objectDir, ((AssetIndex.AssetObject) entry.getValue()).getHash().substring(0, 2)), ((AssetIndex.AssetObject) entry.getValue()).getHash());
+
+				if (!target.isFile()) {
+					target.getParentFile().mkdirs();
+					target.createNewFile();
+					Files.copy(original.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				}
+			}
+
+			//FileUtils.writeStringToFile(new File(virtualRoot, ".lastused"), this.dateAdapter.serializeToString(new Date()));
+		}
+
+		return virtualRoot;
 	}
 
 	private String constructClassPath(CompleteVersion version) {
@@ -293,6 +376,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 	}
 
+	@Override
 	public void onDownloadJobFinished(DownloadJob job) {
 		LoadingForm.instance.getProgressbar().setProgress(1.0f);
 

@@ -46,6 +46,7 @@ public class GuiText extends GuiElement {
 		this(form, font, text, Color.white, Color.black, true);
 	}
 
+	@Override
 	public void render(int x, int y) {
 		super.render(x, y);
 
@@ -101,10 +102,12 @@ public class GuiText extends GuiElement {
 		this.isDirty = true;
 	}
 
+	@Override
 	public int getWidth() {
 		return this.fontMetrics.stringWidth(this.text);
 	}
 
+	@Override
 	public int getHeight() {
 		return this.fontMetrics.getHeight();
 	}

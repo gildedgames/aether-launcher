@@ -21,6 +21,7 @@ public class Agent {
 		return this.version;
 	}
 
+	@Override
 	public String toString() {
 		return "Agent{name='" + this.name + '\'' + ", version=" + this.version + '}';
 	}

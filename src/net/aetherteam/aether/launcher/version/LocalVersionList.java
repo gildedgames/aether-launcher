@@ -37,6 +37,7 @@ public class LocalVersionList extends VersionList {
 		return new FileInputStream(new File(this.baseDirectory, uri));
 	}
 
+	@Override
 	public void refreshVersions() throws IOException {
 		this.clearCache();
 
@@ -99,6 +100,7 @@ public class LocalVersionList extends VersionList {
 		return true;
 	}
 
+	@Override
 	protected String getUrl(String uri) throws IOException {
 		InputStream inputStream = this.getFileInputStream(uri);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
