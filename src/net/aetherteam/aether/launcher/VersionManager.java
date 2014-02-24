@@ -1,10 +1,15 @@
 package net.aetherteam.aether.launcher;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import net.aetherteam.aether.launcher.authentication.GameProfile;
 import net.aetherteam.aether.launcher.download.DownloadJob;
 import net.aetherteam.aether.launcher.download.Downloadable;
 import net.aetherteam.aether.launcher.download.EtagDownloadable;
@@ -37,20 +43,27 @@ public class VersionManager {
 
 	private RemoteVersionList remoteVersionList;
 
+	private RemoteVersionList remoteTestingVersionList;
+
 	private final Gson gson = new Gson();
 
-	public VersionManager(LocalVersionList localVersionList, RemoteVersionList remoteVersionList) {
+	private GameProfile selectedProfile;
+
+	public VersionManager(LocalVersionList localVersionList, RemoteVersionList remoteVersionList, RemoteVersionList remoteTestingVersionList) {
 		this.localVersionList = localVersionList;
 		this.remoteVersionList = remoteVersionList;
+		this.remoteTestingVersionList = remoteTestingVersionList;
 	}
 
 	public ThreadPoolExecutor getExecutorService() {
 		return this.executorService;
 	}
 
-	public void refreshVersions() throws IOException {
+	public void refreshVersions(GameProfile selectedProfile) throws IOException {
+		this.selectedProfile = selectedProfile;
 		this.localVersionList.refreshVersions();
 		this.remoteVersionList.refreshVersions();
+		this.remoteTestingVersionList.refreshVersions();
 
 		if ((this.localVersionList instanceof LocalVersionList)) {
 			for (Version version : this.remoteVersionList.getVersions()) {
@@ -62,18 +75,45 @@ public class VersionManager {
 					this.localVersionList.saveVersion(this.localVersionList.getCompleteVersion(id));
 				}
 			}
+
+			if (isDonator(selectedProfile.getName())) {
+				for (Version version : this.remoteTestingVersionList.getVersions()) {
+					String id = version.getId();
+
+					if (this.localVersionList.getVersion(id) != null) {
+						this.localVersionList.removeVersion(id);
+						this.localVersionList.addVersion(this.remoteTestingVersionList.getCompleteVersion(id));
+						this.localVersionList.saveVersion(this.localVersionList.getCompleteVersion(id));
+					}
+				}
+			}
 		}
 
 		this.localVersionList.saveVersionList();
 	}
 
 	public String[] getVersions() {
-		VersionList versionList = this.remoteVersionList.getVersions().isEmpty() ? this.localVersionList : this.remoteVersionList;
 
-		String[] versionIds = new String[versionList.getVersions().size()];
+		String[] versionIds;
+		if (this.isDonator(this.selectedProfile.getName()) && !this.remoteVersionList.getVersions().isEmpty()) {
+			VersionList versionList = this.remoteVersionList;
+			int remoteLength = versionList.getVersions().size();
+			int length = remoteLength + remoteTestingVersionList.getVersions().size();
+			versionIds = new String[length];
+			int i;
+			for (i = 0; i < remoteLength; ++i) {
+				versionIds[i] = versionList.getVersions().get(i).getId();
+			}
+			for (; i < length; ++i) {
+				versionIds[i] = versionList.getVersions().get(i - remoteLength).getId();
+			}
+		} else {
+			VersionList versionList = this.remoteVersionList.getVersions().isEmpty() ? this.localVersionList : this.remoteVersionList;
+			versionIds = new String[versionList.getVersions().size()];
 
-		for (int i = 0; i < versionList.getVersions().size(); ++i) {
-			versionIds[i] = versionList.getVersions().get(i).getId();
+			for (int i = 0; i < versionList.getVersions().size(); ++i) {
+				versionIds[i] = versionList.getVersions().get(i).getId();
+			}
 		}
 
 		return versionIds;
@@ -151,7 +191,7 @@ public class VersionManager {
 		job.addDownloadables(version.getRequiredDownloadables(OperatingSystem.getCurrentPlatform(), proxy, baseDirectory, false));
 
 		String jarFile = "versions/" + version.getMinecraftVersion() + "/" + version.getMinecraftVersion() + ".jar";
-		job.addDownloadables(new Downloadable[] { new EtagDownloadable(proxy, new URL("https://s3.amazonaws.com/Minecraft.Download/" + jarFile), new File(baseDirectory, jarFile), false) });
+		job.addDownloadables(new Downloadable[]{new EtagDownloadable(proxy, new URL("https://s3.amazonaws.com/Minecraft.Download/" + jarFile), new File(baseDirectory, jarFile), false)});
 
 		return job;
 	}
@@ -162,7 +202,7 @@ public class VersionManager {
 		File assets = new File(baseDirectory, "assets");
 		File objectsFolder = new File(assets, "objects");
 		File indexesFolder = new File(assets, "indexes");
-		String indexName = null;//version.getAssets();
+		String indexName = null;// version.getAssets();
 		long start = System.nanoTime();
 
 		if (indexName == null) {
@@ -201,6 +241,26 @@ public class VersionManager {
 		}
 
 		return result;
+	}
+
+	public boolean isDonator(String username) {
+		URL website;
+
+		try {
+			website = new URL("http://www.gilded-games.com/aether/signature.php?name=" + username);
+			URLConnection connection = website.openConnection();
+			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+			if (!br.readLine().equals("false")) {
+				return true;
+			}
+
+			br.close();
+		} catch (MalformedURLException e) {
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
+
+		return false;
 	}
 
 }

@@ -1,7 +1,14 @@
 package net.aetherteam.aether.launcher;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.UUID;
 
 import net.aetherteam.aether.launcher.authentication.exceptions.AuthenticationException;
@@ -28,7 +35,7 @@ public class Launcher {
 	public Launcher() {
 		//this.baseDirectory = new File("/Users/cafaxo/aetherlauncher_working/");
 		this.baseDirectory = OperatingSystem.getCurrentPlatform().getWorkingDirectory();
-		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy));
+		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteVersionList(this.proxy));
 
 		Launcher.instance = this;
 
@@ -44,7 +51,7 @@ public class Launcher {
 			@Override
 			public void run() {
 				try {
-					Launcher.this.versionManager.refreshVersions();
+					Launcher.this.versionManager.refreshVersions(profileManager.getSelectedProfile());
 				} catch (Throwable e) {
 					Launcher.getInstance().println("Unexpected exception refreshing version list", e);
 				}
@@ -65,6 +72,7 @@ public class Launcher {
 			this.println("Invalid creditentials");
 		}
 	}
+
 
 	public void println(String string) {
 		System.out.println(string);

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import net.aetherteam.aether.launcher.authentication.GameProfile;
 import net.aetherteam.aether.launcher.authentication.yggdrasil.YggdrasilAuthenticationService;
 import net.aetherteam.aether.launcher.utils.FileUtils;
 
@@ -58,6 +59,11 @@ public class ProfileManager {
 
 	public YggdrasilAuthenticationService getAuthenticationService() {
 		return this.authenticationService;
+	}
+	
+	public GameProfile getSelectedProfile()
+	{
+		return authenticationService.getSelectedProfile();
 	}
 
 }

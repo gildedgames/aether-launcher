@@ -16,9 +16,9 @@ public abstract class VersionList {
 
 	protected final Gson gson;
 
-	private final Map<String, Version> versionsByName = new HashMap<String, Version>();
+	protected final Map<String, Version> versionsByName = new HashMap<String, Version>();
 
-	private final List<Version> versions = new ArrayList<Version>();
+	protected final List<Version> versions = new ArrayList<Version>();
 
 	public VersionList() {
 		GsonBuilder builder = new GsonBuilder();
