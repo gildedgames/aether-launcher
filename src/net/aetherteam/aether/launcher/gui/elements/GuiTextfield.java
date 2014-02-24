@@ -29,7 +29,7 @@ public class GuiTextfield extends GuiElement {
 	public void render() {
 		if (GuiTextfield.activeTextfield == this) {
 			if (this.cursorTimer > 30) {
-				GuiElement.renderColoredRect(this.getFadingX() + 6 + this.text.getWidth() + 5, this.y + 2, 5, this.height - 4, this.getHoveringColor());
+				GuiElement.renderColoredRect(this.getFadingX() + 6 + Math.min(this.text.getWidth(), 200) + 5, this.y + 2, 5, this.height - 4, this.getHoveringColor());
 			}
 
 			this.cursorTimer = this.cursorTimer > 60 ? 0 : this.cursorTimer + 1;
@@ -49,9 +49,8 @@ public class GuiTextfield extends GuiElement {
 		}
 		else {
 			this.text.render(this.getFadingX() + 8, this.y + ((this.height - this.text.getHeight()) / 2) + (this.isPassword ? 4 : 0));
-
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 	}
 
 	@Override

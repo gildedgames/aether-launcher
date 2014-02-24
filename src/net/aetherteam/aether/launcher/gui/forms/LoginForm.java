@@ -20,6 +20,8 @@ public class LoginForm extends GuiForm {
 	private GuiRectangle background;
 
 	private GuiText usernameLabel;
+	
+	private GuiText emailLabel;
 
 	private GuiText usernameInput;
 
@@ -42,7 +44,7 @@ public class LoginForm extends GuiForm {
 	public LoginForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
-		Font font = new Font("Athelas", Font.BOLD, 24);
+		Font font = new Font("Athelas", Font.BOLD, 18);
 		Font sfont = new Font("Athelas", Font.BOLD, 20);
 		Font ssfont = new Font("Athelas", Font.BOLD, 18);
 
@@ -50,15 +52,16 @@ public class LoginForm extends GuiForm {
 		this.background.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().backgroundColor);
 		this.add(this.background);
 
-		this.usernameLabel = new GuiText(this, font, "Username");
+		this.usernameLabel = new GuiText(this, font, "Minecraft Username");
+		this.emailLabel = new GuiText(this, font, "or Mojang Email");
 		this.usernameInput = new GuiText(this, sfont, "");
-		this.usernameField = new GuiTextfield(this, (Display.getWidth() - 210) / 2, this.background.getY() + 50, 210, 30, this.usernameInput, false);
+		this.usernameField = new GuiTextfield(this, (Display.getWidth() - 210) / 2, this.background.getY() + 60, 210, 30, this.usernameInput, false);
 		this.usernameField.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor);
 		this.add(this.usernameField);
 
 		this.passwordLabel = new GuiText(this, font, "Password");
 		this.passwordInput = new GuiText(this, sfont, "");
-		this.passwordField = new GuiTextfield(this, (Display.getWidth() - 210) / 2, this.usernameField.getY() + 70, 210, 30, this.passwordInput, true);
+		this.passwordField = new GuiTextfield(this, (Display.getWidth() - 210) / 2, this.usernameField.getY() + 64, 210, 30, this.passwordInput, true);
 		this.passwordField.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor);
 		this.add(this.passwordField);
 
@@ -71,14 +74,17 @@ public class LoginForm extends GuiForm {
 		this.loginButton = new GuiButton(this, (Display.getWidth() - 100) / 2, this.rememberCheckbox.getY() + 40, 100, 35, loginText);
 		this.loginButton.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.loginButton);
+		
+		GuiTextfield.activeTextfield = this.usernameField;
 	}
 
 	@Override
 	public void render() {
 		super.render();
 
-		this.usernameLabel.render((Display.getWidth() - this.usernameLabel.getWidth()) / 2, this.usernameField.getY() - 32);
-		this.passwordLabel.render((Display.getWidth() - this.passwordLabel.getWidth()) / 2, this.passwordField.getY() - 32);
+		this.usernameLabel.render((Display.getWidth() - this.usernameLabel.getWidth()) / 2, this.usernameField.getY() - 50);
+		this.emailLabel.render((Display.getWidth() - this.emailLabel.getWidth()) / 2, this.usernameField.getY() - 25);
+		this.passwordLabel.render((Display.getWidth() - this.passwordLabel.getWidth()) / 2, this.passwordField.getY() - 25);
 		this.rememberLabel.render(this.rememberCheckbox.getX() + 30, this.rememberCheckbox.getY());
 	}
 
