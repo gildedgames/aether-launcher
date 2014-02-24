@@ -1,0 +1,7 @@
+bin
+.metadata
+lib
+src/assets/Thumbs.db
+src/assets/bg/Thumbs.db
+aether-launcher
+.classpath

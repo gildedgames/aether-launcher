@@ -15,8 +15,9 @@ public class Sprite {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		this.texture.bind();
-
+		
 		GL11.glBegin(GL11.GL_QUADS);
+		
 		GL11.glTexCoord2f(0, 0);
 		GL11.glVertex2f(x, y);
 		GL11.glTexCoord2f(1, 0);
@@ -26,6 +27,7 @@ public class Sprite {
 		GL11.glTexCoord2f(0, 1);
 		GL11.glVertex2f(x, y + this.texture.getTextureHeight());
 		GL11.glEnd();
+		
 	}
 
 	public int getWidth() {

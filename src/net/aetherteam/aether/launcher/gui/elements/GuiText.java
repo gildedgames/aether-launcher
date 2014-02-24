@@ -11,6 +11,7 @@ import net.aetherteam.aether.launcher.gui.utils.BufferTexture;
 import net.aetherteam.aether.launcher.gui.utils.GaussianFilter;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
 
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 
 public class GuiText extends GuiElement {

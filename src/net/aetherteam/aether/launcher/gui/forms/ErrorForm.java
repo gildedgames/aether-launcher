@@ -8,6 +8,7 @@ import net.aetherteam.aether.launcher.gui.elements.GuiElement;
 import net.aetherteam.aether.launcher.gui.elements.GuiRectangle;
 import net.aetherteam.aether.launcher.gui.elements.GuiText;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 
@@ -52,6 +53,17 @@ public class ErrorForm extends GuiForm {
 		super.render();
 
 		this.errorMessage.render((Display.getWidth() - this.errorMessage.getWidth()) / 2, ((Display.getHeight() - this.errorMessage.getHeight()) / 2) - 30);
+	}
+	
+	@Override
+	public void onKey(int key, char character){
+		if(key == Keyboard.KEY_RETURN){
+				this.onElementClick(this.okButton);
+				if(this.parentForm instanceof LoginForm){
+					this.setOnScreen(false);
+					this.parentForm.setOnScreen(true);
+				}
+		}
 	}
 
 }

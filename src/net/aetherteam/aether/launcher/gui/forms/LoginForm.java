@@ -11,6 +11,7 @@ import net.aetherteam.aether.launcher.gui.elements.GuiRectangle;
 import net.aetherteam.aether.launcher.gui.elements.GuiText;
 import net.aetherteam.aether.launcher.gui.elements.GuiTextfield;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 
@@ -35,6 +36,8 @@ public class LoginForm extends GuiForm {
 	private GuiCheckbox rememberCheckbox;
 
 	private GuiButton loginButton;
+	
+	private ErrorForm errorForm;
 
 	public LoginForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
@@ -93,12 +96,34 @@ public class LoginForm extends GuiForm {
 				playForm.fadeLeft();
 				this.fadeLeft();
 			} else {
-				ErrorForm errorForm = new ErrorForm(this.panel, this, "Login failed.");
+				errorForm = new ErrorForm(this.panel, this, "Login failed.");
 				errorForm.setFadeX(Display.getWidth());
 				errorForm.fadeLeft();
+				errorForm.setOnScreen(true);
 				this.fadeLeft();
 			}
 		}
 	}
 
+	@Override
+	public void onKey(int key, char character){
+		if(key == Keyboard.KEY_RETURN){
+			if(this.onScreen)
+			{
+				this.onElementClick(this.loginButton);
+				this.onScreen = false;
+			}
+		}
+		else if(key == Keyboard.KEY_TAB){
+			if(GuiTextfield.activeTextfield == this.usernameField)
+			{
+				GuiTextfield.activeTextfield = this.passwordField;
+			}
+			else
+			{
+				GuiTextfield.activeTextfield = this.usernameField;
+			}
+		}
+	}
+	
 }

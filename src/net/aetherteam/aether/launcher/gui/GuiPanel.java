@@ -63,11 +63,13 @@ public class GuiPanel {
 			if (Keyboard.getEventKeyState()) {
 				int key = Keyboard.getEventKey();
 				char character = Keyboard.getEventCharacter();
+				boolean repeated = Keyboard.isRepeatEvent();
 
 				for (GuiForm form : this.forms) {
 					for (GuiElement element : form.getElements()) {
-						element.onKey(key, character);
+						element.onKey(key, character, repeated);
 					}
+					form.onKey(key, character);
 				}
 			}
 		}
