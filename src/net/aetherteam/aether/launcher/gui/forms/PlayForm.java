@@ -10,6 +10,7 @@ import net.aetherteam.aether.launcher.gui.elements.GuiElement;
 import net.aetherteam.aether.launcher.gui.elements.GuiRectangle;
 import net.aetherteam.aether.launcher.gui.elements.GuiText;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 public class PlayForm extends GuiForm {
@@ -127,6 +128,15 @@ public class PlayForm extends GuiForm {
 
 			this.fadeLeft();
 			this.kill = true;
+			this.setOnScreen(false);
+		}
+	}
+	
+	@Override
+	public void onKey(int key, char character){
+		if(key == Keyboard.KEY_RETURN)
+		{
+			this.onElementClick(this.playButton);
 		}
 	}
 

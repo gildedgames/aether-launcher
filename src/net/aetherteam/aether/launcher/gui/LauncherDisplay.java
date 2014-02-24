@@ -15,6 +15,7 @@ import net.aetherteam.aether.launcher.gui.forms.PlayForm;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -93,7 +94,8 @@ public class LauncherDisplay {
 		}
 
 		this.panorama = new Panorama(new String[] { "assets/bg/panorama0.png", "assets/bg/panorama1.png", "assets/bg/panorama2.png", "assets/bg/panorama3.png", "assets/bg/panorama4.png", "assets/bg/panorama5.png", });
-
+		Keyboard.enableRepeatEvents(true);
+		
 		try {
 			this.music = AudioLoader.getStreamingAudio("OGG", ResourceLoader.getResource("assets/music.ogg"));
 			this.logo = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/aether_logo.png")));

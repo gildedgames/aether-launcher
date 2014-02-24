@@ -26,6 +26,8 @@ public abstract class GuiForm {
 	private int fadeX;
 
 	protected boolean kill;
+	
+	protected boolean onScreen = true;
 
 	public GuiForm(GuiPanel panel, GuiForm parentForm) {
 		this.panel = panel;
@@ -83,6 +85,9 @@ public abstract class GuiForm {
 	public void onElementClick(GuiElement element) {
 		element.onMouseClick();
 	}
+	
+	public void onKey(int key, char character){
+	}
 
 	public void add(GuiElement element) {
 		this.addElements.add(element);
@@ -122,6 +127,14 @@ public abstract class GuiForm {
 
 	public GuiPanel getPanel() {
 		return this.panel;
+	}
+	
+	public boolean onScreen(){
+		return onScreen;
+	}
+	
+	public void setOnScreen(boolean onScreen){
+		this.onScreen = onScreen;
 	}
 
 }

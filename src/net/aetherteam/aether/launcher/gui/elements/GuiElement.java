@@ -117,7 +117,7 @@ public abstract class GuiElement {
 	public void onMouseClick() {
 	}
 
-	public void onKey(int key, char character) {
+	public void onKey(int key, char character, boolean repeated) {
 	}
 
 	public Color getColor() {
