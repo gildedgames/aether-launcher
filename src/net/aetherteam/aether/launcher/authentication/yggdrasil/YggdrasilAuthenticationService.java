@@ -140,7 +140,7 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 
 	public String[] getAvailableProfileNames() {
 		if (this.profiles == null) {
-			return new String[] { this.getSelectedProfile().getName() };
+			return new String[]{this.getSelectedProfile().getName()};
 		}
 
 		String[] profileNames = new String[this.profiles.length];
@@ -197,9 +197,20 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 	}
 
 	@Override
+	public Map<String, String> removeProfile() {
+		Map<String, String> result = super.removeProfile();
+
+		if (StringUtils.isNotBlank(this.getAccessToken())) {
+			result.put("accessToken", this.getAccessToken());
+		}
+
+		return result;
+	}
+
+	@Override
 	public String getSessionToken() {
 		if ((this.isLoggedIn()) && (this.getSelectedProfile() != null) && (this.canPlayOnline())) {
-			return String.format("token:%s:%s", new Object[] { this.getAccessToken(), this.getSelectedProfile().getId() });
+			return String.format("token:%s:%s", new Object[]{this.getAccessToken(), this.getSelectedProfile().getId()});
 		}
 		return null;
 	}
@@ -220,4 +231,5 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 	public String toString() {
 		return "YggdrasilAuthenticationService{agent=" + this.agent + ", profiles=" + Arrays.toString(this.profiles) + ", selectedProfile=" + this.getSelectedProfile() + ", sessionToken='" + this.getSessionToken() + '\'' + ", username='" + this.getUsername() + '\'' + ", isLoggedIn=" + this.isLoggedIn() + ", canPlayOnline=" + this.canPlayOnline() + ", accessToken='" + this.accessToken + '\'' + ", clientToken='" + this.getClientToken() + '\'' + '}';
 	}
+
 }

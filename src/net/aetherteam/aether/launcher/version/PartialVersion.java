@@ -13,6 +13,8 @@ public class PartialVersion implements Version {
 
 	private List<String> changelog;
 
+	private boolean isTestVersion = false;
+
 	public PartialVersion() {
 	}
 
@@ -74,5 +76,16 @@ public class PartialVersion implements Version {
 	@Override
 	public String toString() {
 		return "PartialVersion{id='" + this.id + '\'' + ", updateTime=" + this.time + ", releaseTime=" + this.releaseTime + '}';
+	}
+
+	@Override
+	public boolean isTestVersion() {
+		return isTestVersion;
+	}
+
+	@Override
+	public void setIsTestVersion(boolean b) {
+		this.isTestVersion = b;
+
 	}
 }

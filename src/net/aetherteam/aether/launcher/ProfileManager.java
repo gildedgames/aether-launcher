@@ -57,12 +57,21 @@ public class ProfileManager {
 		}
 	}
 
+	public void removeProfile() {
+		String rawCredentials = this.gson.toJson(this.authenticationService.removeProfile());
+
+		try {
+			FileUtils.writeStringToFile(new File(Launcher.getInstance().getBaseDirectory(), "profile.json"), rawCredentials);
+		} catch (IOException e) {
+			Launcher.getInstance().println("Couldn't write profile.");
+		}
+	}
+
 	public YggdrasilAuthenticationService getAuthenticationService() {
 		return this.authenticationService;
 	}
-	
-	public GameProfile getSelectedProfile()
-	{
+
+	public GameProfile getSelectedProfile() {
 		return authenticationService.getSelectedProfile();
 	}
 

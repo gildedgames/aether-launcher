@@ -17,4 +17,8 @@ public interface Version {
 
 	public abstract List<String> getChangelog();
 
+	public abstract boolean isTestVersion();
+
+	public abstract void setIsTestVersion(boolean b);
+
 }

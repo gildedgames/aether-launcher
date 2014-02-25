@@ -19,7 +19,7 @@ public class AdForm extends GuiForm {
 	GuiButtonSprite facebook;
 
 	GuiButtonSprite twitter;
-	
+
 	GuiButtonSprite audioMute;
 
 	public AdForm(GuiPanel panel, GuiForm parentForm) {
@@ -36,9 +36,9 @@ public class AdForm extends GuiForm {
 		this.twitter = new GuiButtonSprite(this, Display.getWidth() - 110, Display.getHeight() - 50, LauncherDisplay.instance.twitter);
 		this.twitter.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 		this.add(this.twitter);
-		
-		this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 50, 20, LauncherDisplay.instance.audioMute);
-		this.audioMute.setColor(new Color(0,0,0,0), new Color(1,1,1,0.8F));
+
+		this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 50, 20, LauncherDisplay.instance.audioPlay);
+		this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 		this.add(this.audioMute);
 	}
 
@@ -64,15 +64,19 @@ public class AdForm extends GuiForm {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-		}
-		else if(element == this.audioMute) {
-			if(LauncherDisplay.instance.isMusicPlaying())
-			{
+		} else if (element == this.audioMute) {
+			if (LauncherDisplay.instance.isMusicPlaying()) {
 				LauncherDisplay.instance.stopMusic();
-			}
-			else
-			{
+				this.remove(this.audioMute);
+				this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 50, 20, LauncherDisplay.instance.audioMute);
+				this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
+				this.add(this.audioMute);
+			} else {
 				LauncherDisplay.instance.startMusic();
+				this.remove(this.audioMute);
+				this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 50, 20, LauncherDisplay.instance.audioPlay);
+				this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
+				this.add(this.audioMute);
 			}
 		}
 	}

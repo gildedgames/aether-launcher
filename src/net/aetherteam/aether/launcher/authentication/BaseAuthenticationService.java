@@ -30,6 +30,8 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 
 	private String selectedVersion;
 
+	private boolean isTestVersion;
+
 	@Override
 	public boolean canLogIn() {
 		return (!this.canPlayOnline()) && (StringUtils.isNotBlank(this.getUsername())) && (StringUtils.isNotBlank(this.getPassword()));
@@ -121,6 +123,11 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		return result;
 	}
 
+	public Map<String, String> removeProfile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public boolean shouldRememberMe() {
 		return this.shouldRememberMe;
@@ -142,6 +149,10 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 
 	public String getSelectedVersion() {
 		return this.selectedVersion;
+	}
+
+	public boolean getIsTestVersion() {
+		return this.isTestVersion;
 	}
 
 	public void setSelectedVersion(String selectedVersion) {
@@ -211,7 +222,7 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 			String password = dis.readUTF();
 			dis.close();
 
-			return new String[] { username, password };
+			return new String[]{username, password};
 		} catch (Exception e) {
 			Launcher.getInstance().println("Couldn't load old lastlogin file", e);
 		}
@@ -229,4 +240,5 @@ public abstract class BaseAuthenticationService implements AuthenticationService
 		cipher.init(mode, pbeKey, pbeParamSpec);
 		return cipher;
 	}
+
 }

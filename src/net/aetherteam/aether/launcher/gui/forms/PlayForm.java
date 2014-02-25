@@ -54,12 +54,19 @@ public class PlayForm extends GuiForm {
 		this.versions = new GuiDropdown(this, (Display.getWidth() - versionsW) / 2, this.background.getY() + 75 + 25 + 15, versionsW, 30, font, Launcher.getInstance().getVersionManager().getVersions());
 		this.versions.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 
-		if (Launcher.getInstance().getProfileManager().getAuthenticationService().getSelectedVersion() != null) {
-			this.versions.setSelected(Launcher.getInstance().getProfileManager().getAuthenticationService().getSelectedVersion());
-		} else {
-			String[] versions = Launcher.getInstance().getVersionManager().getVersions();
-			this.versions.setSelected(versions[versions.length - 1]);
-		}
+		/*
+		 * if
+		 * (Launcher.getInstance().getProfileManager().getAuthenticationService
+		 * ().getSelectedVersion() != null) {
+		 * this.versions.setSelected(Launcher.
+		 * getInstance().getProfileManager().getAuthenticationService
+		 * ().getSelectedVersion()); } else { String[] versions =
+		 * Launcher.getInstance().getVersionManager().getVersions();
+		 * this.versions.setSelected(versions[versions.length - 1]); }
+		 */
+
+		String[] versions = Launcher.getInstance().getVersionManager().getVersions();
+		this.versions.setSelected(versions[versions.length - 1]);
 
 		this.add(this.versions);
 
@@ -131,11 +138,10 @@ public class PlayForm extends GuiForm {
 			this.setOnScreen(false);
 		}
 	}
-	
+
 	@Override
-	public void onKey(int key, char character){
-		if(key == Keyboard.KEY_RETURN)
-		{
+	public void onKey(int key, char character) {
+		if (key == Keyboard.KEY_RETURN) {
 			this.onElementClick(this.playButton);
 		}
 	}

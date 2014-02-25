@@ -20,7 +20,7 @@ public class LoginForm extends GuiForm {
 	private GuiRectangle background;
 
 	private GuiText usernameLabel;
-	
+
 	private GuiText emailLabel;
 
 	private GuiText usernameInput;
@@ -38,7 +38,7 @@ public class LoginForm extends GuiForm {
 	private GuiCheckbox rememberCheckbox;
 
 	private GuiButton loginButton;
-	
+
 	private ErrorForm errorForm;
 
 	public LoginForm(GuiPanel panel, GuiForm parentForm) {
@@ -74,7 +74,7 @@ public class LoginForm extends GuiForm {
 		this.loginButton = new GuiButton(this, (Display.getWidth() - 100) / 2, this.rememberCheckbox.getY() + 40, 100, 35, loginText);
 		this.loginButton.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.loginButton);
-		
+
 		GuiTextfield.activeTextfield = this.usernameField;
 	}
 
@@ -97,10 +97,12 @@ public class LoginForm extends GuiForm {
 			Launcher.getInstance().login(this.usernameField.getText(), this.passwordField.getText());
 
 			if (Launcher.getInstance().getProfileManager().getAuthenticationService().isLoggedIn()) {
+				Launcher.getInstance().getVersionManager().setSelectedProfile(Launcher.getInstance().getProfileManager().getAuthenticationService().getAvailableProfileNames()[0]);
 				PlayForm playForm = new PlayForm(this.panel, this);
 				playForm.setFadeX(Display.getWidth());
 				playForm.fadeLeft();
 				this.fadeLeft();
+				this.kill = true;
 			} else {
 				errorForm = new ErrorForm(this.panel, this, "Login failed.");
 				errorForm.setFadeX(Display.getWidth());
@@ -112,24 +114,19 @@ public class LoginForm extends GuiForm {
 	}
 
 	@Override
-	public void onKey(int key, char character){
-		if(key == Keyboard.KEY_RETURN){
-			if(this.onScreen)
-			{
+	public void onKey(int key, char character) {
+		if (key == Keyboard.KEY_RETURN) {
+			if (this.onScreen) {
 				this.onElementClick(this.loginButton);
 				this.onScreen = false;
 			}
-		}
-		else if(key == Keyboard.KEY_TAB){
-			if(GuiTextfield.activeTextfield == this.usernameField)
-			{
+		} else if (key == Keyboard.KEY_TAB) {
+			if (GuiTextfield.activeTextfield == this.usernameField) {
 				GuiTextfield.activeTextfield = this.passwordField;
-			}
-			else
-			{
+			} else {
 				GuiTextfield.activeTextfield = this.usernameField;
 			}
 		}
 	}
-	
+
 }

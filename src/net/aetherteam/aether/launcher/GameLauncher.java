@@ -179,16 +179,16 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		processLauncher.directory(gameDirectory);
 
 		if (OperatingSystem.getCurrentPlatform().equals(OperatingSystem.OSX)) {
-			processLauncher.addCommands(new String[] { "-Xdock:icon=" + new File(assetsDir, "icons/minecraft.icns").getAbsolutePath(), "-Xdock:name=Minecraft" });
+			processLauncher.addCommands(new String[]{"-Xdock:icon=" + new File(assetsDir, "icons/minecraft.icns").getAbsolutePath(), "-Xdock:name=Minecraft"});
 		}
 
 		boolean is32Bit = "32".equals(System.getProperty("sun.arch.data.model"));
 		String defaultArgument = is32Bit ? "-Xmx512M" : "-Xmx1G";
 		processLauncher.addSplitCommands(defaultArgument);
 
-		processLauncher.addCommands(new String[] { "-Djava.library.path=" + this.nativeDir.getAbsolutePath() });
-		processLauncher.addCommands(new String[] { "-cp", this.constructClassPath(this.version) });
-		processLauncher.addCommands(new String[] { this.version.getMainClass() });
+		processLauncher.addCommands(new String[]{"-Djava.library.path=" + this.nativeDir.getAbsolutePath()});
+		processLauncher.addCommands(new String[]{"-cp", this.constructClassPath(this.version)});
+		processLauncher.addCommands(new String[]{this.version.getMainClass()});
 
 		AuthenticationService auth = Launcher.getInstance().getProfileManager().getAuthenticationService();
 
@@ -197,7 +197,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		processLauncher.addCommands(args);
 
 		if ((auth == null) || (auth.getSelectedProfile() == null)) {
-			processLauncher.addCommands(new String[] { "--demo" });
+			processLauncher.addCommands(new String[]{"--demo"});
 		}
 		try {
 			List<String> parts = processLauncher.getFullCommands();
@@ -264,7 +264,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		File assetsDir = new File(Launcher.instance.getBaseDirectory(), "assets");
 		File indexDir = new File(assetsDir, "indexes");
 		File objectDir = new File(assetsDir, "objects");
-		String assetVersion = "legacy";//this.version.getAssets() == null ? "legacy" : this.version.getAssets();
+		String assetVersion = "legacy";// this.version.getAssets() == null ?
+										// "legacy" : this.version.getAssets();
 		File indexFile = new File(indexDir, assetVersion + ".json");
 		File virtualRoot = new File(new File(assetsDir, "virtual"), assetVersion);
 
@@ -292,7 +293,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 				}
 			}
 
-			//FileUtils.writeStringToFile(new File(virtualRoot, ".lastused"), this.dateAdapter.serializeToString(new Date()));
+			// FileUtils.writeStringToFile(new File(virtualRoot, ".lastused"),
+			// this.dateAdapter.serializeToString(new Date()));
 		}
 
 		return virtualRoot;

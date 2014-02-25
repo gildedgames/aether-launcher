@@ -42,6 +42,8 @@ public class CompleteVersion implements Version {
 
 	private List<Rule> rules;
 
+	private boolean isTestVersion = false;
+
 	public CompleteVersion() {
 	}
 
@@ -293,5 +295,15 @@ public class CompleteVersion implements Version {
 
 	public String getIncompatibilityReason() {
 		return this.incompatibilityReason;
+	}
+
+	@Override
+	public boolean isTestVersion() {
+		return this.isTestVersion;
+	}
+
+	@Override
+	public void setIsTestVersion(boolean b) {
+		this.isTestVersion = b;
 	}
 }

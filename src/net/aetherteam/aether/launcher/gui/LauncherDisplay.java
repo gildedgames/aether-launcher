@@ -3,15 +3,12 @@ package net.aetherteam.aether.launcher.gui;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
 import net.aetherteam.aether.launcher.Launcher;
-import net.aetherteam.aether.launcher.gui.elements.GuiButton;
 import net.aetherteam.aether.launcher.gui.forms.AdForm;
 import net.aetherteam.aether.launcher.gui.forms.LoginForm;
 import net.aetherteam.aether.launcher.gui.forms.PlayForm;
@@ -48,8 +45,10 @@ public class LauncherDisplay {
 	private Audio music;
 
 	private GuiPanel panel;
-	
+
 	public Sprite audioMute;
+
+	public Sprite audioPlay;
 
 	private boolean shouldTerminate;
 
@@ -61,21 +60,23 @@ public class LauncherDisplay {
 		this.init();
 		this.start();
 	}
-	
-	public ByteBuffer loadIcon(String filename, int width, int height) throws IOException {
-	    BufferedImage image = ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream(filename))); // load image
 
-	    // convert image to byte array
-	    byte[] imageBytes = new byte[width * height * 4];
-	    for (int i = 0; i < height; i++) {
-	        for (int j = 0; j < width; j++) {
-	            int pixel = image.getRGB(j, i);
-	            for (int k = 0; k < 3; k++) // red, green, blue
-	                imageBytes[(i*16+j)*4 + k] = (byte)(((pixel>>(2-k)*8))&255);
-	            imageBytes[(i*16+j)*4 + 3] = (byte)(((pixel>>(3)*8))&255); // alpha
-	        }
-	    }
-	    return ByteBuffer.wrap(imageBytes);
+	public ByteBuffer loadIcon(String filename, int width, int height) throws IOException {
+		BufferedImage image = ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream(filename))); // load
+																													// image
+
+		// convert image to byte array
+		byte[] imageBytes = new byte[width * height * 4];
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				int pixel = image.getRGB(j, i);
+				for (int k = 0; k < 3; k++)
+					// red, green, blue
+					imageBytes[(i * 16 + j) * 4 + k] = (byte) (((pixel >> (2 - k) * 8)) & 255);
+				imageBytes[(i * 16 + j) * 4 + 3] = (byte) (((pixel >> (3) * 8)) & 255); // alpha
+			}
+		}
+		return ByteBuffer.wrap(imageBytes);
 	}
 
 	public ByteBuffer loadIcon(String url) {
@@ -92,26 +93,20 @@ public class LauncherDisplay {
 
 		return null;
 	}
-	
+
 	public void loadIcons() {
-		/*try {
-		    ByteBuffer[] icons = new ByteBuffer[4];
-		    icons[0] = loadIcon("assets/icon_16.png", 16, 16);
-		    icons[1] = loadIcon("assets/icon_32.png", 32, 32);
-		    icons[2] = loadIcon("assets/icon_128.png", 64, 64);
-		    icons[3] = loadIcon("assets/icon_128.png", 128, 128);
-		    Display.setIcon(icons);
-		} catch (IOException ex) {
-		    ex.printStackTrace();
-		}*/
-		
+		/*
+		 * try { ByteBuffer[] icons = new ByteBuffer[4]; icons[0] =
+		 * loadIcon("assets/icon_16.png", 16, 16); icons[1] =
+		 * loadIcon("assets/icon_32.png", 32, 32); icons[2] =
+		 * loadIcon("assets/icon_128.png", 64, 64); icons[3] =
+		 * loadIcon("assets/icon_128.png", 128, 128); Display.setIcon(icons); }
+		 * catch (IOException ex) { ex.printStackTrace(); }
+		 */
+
 		try {
-			Display.setIcon(new ByteBuffer[] {
-			        new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_16.png"))), false, false, null),
-			        new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_32.png"))), false, false, null),
-			        new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_64.png"))), false, false, null),
-			        new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_128.png"))), false, false, null)
-			        });
+			Display.setIcon(new ByteBuffer[]{new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_16.png"))), false, false, null), new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_32.png"))), false, false, null), new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_64.png"))), false, false, null),
+					new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_128.png"))), false, false, null)});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,16 +126,17 @@ public class LauncherDisplay {
 			System.exit(0);
 		}
 
-		this.panorama = new Panorama(new String[] { "assets/bg/panorama0.png", "assets/bg/panorama1.png", "assets/bg/panorama2.png", "assets/bg/panorama3.png", "assets/bg/panorama4.png", "assets/bg/panorama5.png", });
+		this.panorama = new Panorama(new String[]{"assets/bg/panorama0.png", "assets/bg/panorama1.png", "assets/bg/panorama2.png", "assets/bg/panorama3.png", "assets/bg/panorama4.png", "assets/bg/panorama5.png",});
 		Keyboard.enableRepeatEvents(true);
-		
+
 		try {
 			this.music = AudioLoader.getStreamingAudio("OGG", ResourceLoader.getResource("assets/music.ogg"));
 			this.logo = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/aether_logo.png")));
 			this.craftHosting = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/craftnode.png")));
 			this.facebook = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/facebook.png")));
 			this.twitter = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/twitter.png")));
-			this.audioMute = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/craftnode.png")));
+			this.audioPlay = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound.png")));
+			this.audioMute = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound_off.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -215,21 +211,18 @@ public class LauncherDisplay {
 		SoundStore.get().poll(0);
 	}
 
-	public void stopMusic()
-	{
+	public void stopMusic() {
 		this.music.stop();
 	}
-	
-	public void startMusic()
-	{
+
+	public void startMusic() {
 		this.music.playAsMusic(1.0f, 0.5f, true);
 	}
-	
-	public boolean isMusicPlaying()
-	{
+
+	public boolean isMusicPlaying() {
 		return this.music.isPlaying();
 	}
-	
+
 	public static void main(String[] argv) {
 		new LauncherDisplay();
 	}

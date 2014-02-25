@@ -1,19 +1,14 @@
 package net.aetherteam.aether.launcher;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.UUID;
 
+import net.aetherteam.aether.launcher.authentication.GameProfile;
 import net.aetherteam.aether.launcher.authentication.exceptions.AuthenticationException;
 import net.aetherteam.aether.launcher.authentication.yggdrasil.YggdrasilAuthenticationService;
 import net.aetherteam.aether.launcher.version.LocalVersionList;
+import net.aetherteam.aether.launcher.version.RemoteTestingVersionList;
 import net.aetherteam.aether.launcher.version.RemoteVersionList;
 
 public class Launcher {
@@ -33,9 +28,10 @@ public class Launcher {
 	private UUID clientToken = UUID.randomUUID();
 
 	public Launcher() {
-		//this.baseDirectory = new File("/Users/cafaxo/aetherlauncher_working/");
+		// this.baseDirectory = new
+		// File("/Users/cafaxo/aetherlauncher_working/");
 		this.baseDirectory = OperatingSystem.getCurrentPlatform().getWorkingDirectory();
-		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteVersionList(this.proxy));
+		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteTestingVersionList(this.proxy));
 
 		Launcher.instance = this;
 
@@ -51,9 +47,11 @@ public class Launcher {
 			@Override
 			public void run() {
 				try {
-					Launcher.this.versionManager.refreshVersions(profileManager.getSelectedProfile());
+					GameProfile profile = profileManager.getSelectedProfile();
+					Launcher.this.versionManager.refreshVersions(profile != null ? profileManager.getSelectedProfile().getName() : null);
 				} catch (Throwable e) {
 					Launcher.getInstance().println("Unexpected exception refreshing version list", e);
+					e.printStackTrace();
 				}
 			}
 		});
@@ -72,7 +70,6 @@ public class Launcher {
 			this.println("Invalid creditentials");
 		}
 	}
-
 
 	public void println(String string) {
 		System.out.println(string);

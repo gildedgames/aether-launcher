@@ -18,18 +18,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import net.aetherteam.aether.launcher.authentication.GameProfile;
 import net.aetherteam.aether.launcher.download.DownloadJob;
 import net.aetherteam.aether.launcher.download.Downloadable;
 import net.aetherteam.aether.launcher.download.EtagDownloadable;
 import net.aetherteam.aether.launcher.utils.FileUtils;
+import net.aetherteam.aether.launcher.utils.StringUtils;
 import net.aetherteam.aether.launcher.version.CompleteVersion;
 import net.aetherteam.aether.launcher.version.Http;
 import net.aetherteam.aether.launcher.version.LocalVersionList;
+import net.aetherteam.aether.launcher.version.RemoteTestingVersionList;
 import net.aetherteam.aether.launcher.version.RemoteVersionList;
 import net.aetherteam.aether.launcher.version.Version;
 import net.aetherteam.aether.launcher.version.VersionList;
 import net.aetherteam.aether.launcher.version.VersionSyncInfo;
+import net.aetherteam.aether.launcher.version.VersionSyncInfo.VersionSource;
 import net.aetherteam.aether.launcher.version.assets.AssetDownloadable;
 import net.aetherteam.aether.launcher.version.assets.AssetIndex;
 
@@ -43,13 +45,13 @@ public class VersionManager {
 
 	private RemoteVersionList remoteVersionList;
 
-	private RemoteVersionList remoteTestingVersionList;
+	private RemoteTestingVersionList remoteTestingVersionList;
 
 	private final Gson gson = new Gson();
 
-	private GameProfile selectedProfile;
+	private String selectedProfile;
 
-	public VersionManager(LocalVersionList localVersionList, RemoteVersionList remoteVersionList, RemoteVersionList remoteTestingVersionList) {
+	public VersionManager(LocalVersionList localVersionList, RemoteVersionList remoteVersionList, RemoteTestingVersionList remoteTestingVersionList) {
 		this.localVersionList = localVersionList;
 		this.remoteVersionList = remoteVersionList;
 		this.remoteTestingVersionList = remoteTestingVersionList;
@@ -59,11 +61,13 @@ public class VersionManager {
 		return this.executorService;
 	}
 
-	public void refreshVersions(GameProfile selectedProfile) throws IOException {
+	public void refreshVersions(String selectedProfile) throws IOException {
 		this.selectedProfile = selectedProfile;
 		this.localVersionList.refreshVersions();
 		this.remoteVersionList.refreshVersions();
 		this.remoteTestingVersionList.refreshVersions();
+
+		boolean isDonator = StringUtils.isNotBlank(selectedProfile) ? this.isBetaTester(selectedProfile) : false;
 
 		if ((this.localVersionList instanceof LocalVersionList)) {
 			for (Version version : this.remoteVersionList.getVersions()) {
@@ -76,9 +80,10 @@ public class VersionManager {
 				}
 			}
 
-			if (isDonator(selectedProfile.getName())) {
+			if (isDonator) {
 				for (Version version : this.remoteTestingVersionList.getVersions()) {
 					String id = version.getId();
+					version.setIsTestVersion(true);
 
 					if (this.localVersionList.getVersion(id) != null) {
 						this.localVersionList.removeVersion(id);
@@ -95,7 +100,7 @@ public class VersionManager {
 	public String[] getVersions() {
 
 		String[] versionIds;
-		if (this.isDonator(this.selectedProfile.getName()) && !this.remoteVersionList.getVersions().isEmpty()) {
+		if (StringUtils.isNotBlank(selectedProfile) && this.isBetaTester(this.selectedProfile) && !this.remoteVersionList.getVersions().isEmpty()) {
 			VersionList versionList = this.remoteVersionList;
 			int remoteLength = versionList.getVersions().size();
 			int length = remoteLength + remoteTestingVersionList.getVersions().size();
@@ -105,7 +110,9 @@ public class VersionManager {
 				versionIds[i] = versionList.getVersions().get(i).getId();
 			}
 			for (; i < length; ++i) {
-				versionIds[i] = versionList.getVersions().get(i - remoteLength).getId();
+				Version version = remoteTestingVersionList.getVersions().get(i - remoteLength);
+				versionIds[i] = version.getId();
+				version.setIsTestVersion(true);
 			}
 		} else {
 			VersionList versionList = this.remoteVersionList.getVersions().isEmpty() ? this.localVersionList : this.remoteVersionList;
@@ -124,10 +131,16 @@ public class VersionManager {
 	}
 
 	public VersionSyncInfo getVersionSyncInfo(String name) {
-		return this.getVersionSyncInfo(this.localVersionList.getVersion(name), this.remoteVersionList.getVersion(name));
+		Version remoteVersion = this.remoteVersionList.getVersion(name);
+		boolean testingVersion = false;
+		if (remoteVersion == null) {
+			remoteVersion = this.remoteTestingVersionList.getVersion(name);
+			testingVersion = true;
+		}
+		return this.getVersionSyncInfo(this.localVersionList.getVersion(name), remoteVersion, testingVersion);
 	}
 
-	public VersionSyncInfo getVersionSyncInfo(Version localVersion, Version remoteVersion) {
+	public VersionSyncInfo getVersionSyncInfo(Version localVersion, Version remoteVersion, boolean testingVersion) {
 		boolean installed = localVersion != null;
 		boolean upToDate = installed;
 
@@ -138,7 +151,7 @@ public class VersionManager {
 			upToDate &= this.localVersionList.hasAllFiles((CompleteVersion) localVersion, OperatingSystem.getCurrentPlatform());
 		}
 
-		return new VersionSyncInfo(localVersion, remoteVersion, installed, upToDate);
+		return new VersionSyncInfo(localVersion, remoteVersion, installed, upToDate, testingVersion);
 	}
 
 	public List<VersionSyncInfo> getInstalledVersions() {
@@ -146,7 +159,10 @@ public class VersionManager {
 
 		for (Version version : this.localVersionList.getVersions()) {
 			if (version.getUpdatedTime() != null) {
-				VersionSyncInfo syncInfo = this.getVersionSyncInfo(version, this.remoteVersionList.getVersion(version.getId()));
+				VersionSyncInfo syncInfo = this.getVersionSyncInfo(version, this.remoteVersionList.getVersion(version.getId()), false);
+				if (syncInfo == null) {
+					syncInfo = this.getVersionSyncInfo(version, this.remoteTestingVersionList.getVersion(version.getId()), true);
+				}
 				result.add(syncInfo);
 			}
 		}
@@ -161,12 +177,21 @@ public class VersionManager {
 		return this.localVersionList;
 	}
 
+	public VersionList getRemoteTestingVersionList() {
+		return this.remoteTestingVersionList;
+	}
+
+	public void setSelectedProfile(String profile) {
+		this.selectedProfile = profile;
+	}
+
 	public CompleteVersion getLatestCompleteVersion(VersionSyncInfo syncInfo) throws IOException {
-		if (syncInfo.getLatestSource() == VersionSyncInfo.VersionSource.REMOTE) {
+		VersionSource latestSource = syncInfo.getLatestSource();
+		if (latestSource != VersionSource.LOCAL) {
 			CompleteVersion result = null;
 			IOException exception = null;
 			try {
-				result = this.remoteVersionList.getCompleteVersion(syncInfo.getLatestVersion());
+				result = latestSource == VersionSource.REMOTE ? this.remoteVersionList.getCompleteVersion(syncInfo.getLatestVersion()) : this.remoteTestingVersionList.getCompleteVersion(syncInfo.getLatestVersion());
 			} catch (IOException e) {
 				exception = e;
 				try {
@@ -175,19 +200,24 @@ public class VersionManager {
 				}
 			}
 			if (result != null) {
+				result.setIsTestVersion(latestSource == VersionSource.REMOTE_TESTING);
 				return result;
 			}
 			throw exception;
 		}
 
-		return this.localVersionList.getCompleteVersion(syncInfo.getLatestVersion());
+		CompleteVersion version = this.localVersionList.getCompleteVersion(syncInfo.getLatestVersion());
+		if (version != null) {
+			version.setIsTestVersion(latestSource == VersionSource.REMOTE_TESTING);
+		}
+		return version;
 	}
 
 	public DownloadJob downloadVersion(VersionSyncInfo syncInfo, DownloadJob job) throws IOException {
 		CompleteVersion version = this.getLatestCompleteVersion(syncInfo);
 		File baseDirectory = this.localVersionList.getBaseDirectory();
 		Proxy proxy = this.remoteVersionList.getProxy();
-
+		// TODO check this shit bro
 		job.addDownloadables(version.getRequiredDownloadables(OperatingSystem.getCurrentPlatform(), proxy, baseDirectory, false));
 
 		String jarFile = "versions/" + version.getMinecraftVersion() + "/" + version.getMinecraftVersion() + ".jar";
@@ -251,6 +281,27 @@ public class VersionManager {
 			URLConnection connection = website.openConnection();
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
 			if (!br.readLine().equals("false")) {
+				return true;
+			}
+
+			br.close();
+		} catch (MalformedURLException e) {
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
+
+		return false;
+	}
+
+	public boolean isBetaTester(String username) {
+		URL website;
+
+		try {
+			website = new URL("http://aether.craftnode.me/launcher/beta_testers.php?name=" + username);
+			URLConnection connection = website.openConnection();
+			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+
+			if (!br.readLine().equals("false ")) {
 				return true;
 			}
 

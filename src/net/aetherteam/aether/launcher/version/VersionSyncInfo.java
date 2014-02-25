@@ -10,11 +10,14 @@ public class VersionSyncInfo {
 
 	private final boolean isUpToDate;
 
-	public VersionSyncInfo(Version localVersion, Version remoteVersion, boolean installed, boolean upToDate) {
+	private final boolean isTesting;
+
+	public VersionSyncInfo(Version localVersion, Version remoteVersion, boolean installed, boolean upToDate, boolean isTesting) {
 		this.localVersion = localVersion;
 		this.remoteVersion = remoteVersion;
 		this.isInstalled = installed;
 		this.isUpToDate = upToDate;
+		this.isTesting = isTesting;
 	}
 
 	public Version getLocalVersion() {
@@ -26,7 +29,8 @@ public class VersionSyncInfo {
 	}
 
 	public Version getLatestVersion() {
-		if (this.getLatestSource() == VersionSource.REMOTE) {
+		VersionSource latestSource = this.getLatestSource();
+		if (latestSource == VersionSource.REMOTE || latestSource == VersionSource.REMOTE_TESTING) {
 			return this.remoteVersion;
 		}
 		return this.localVersion;
@@ -34,13 +38,13 @@ public class VersionSyncInfo {
 
 	public VersionSource getLatestSource() {
 		if (this.getLocalVersion() == null) {
-			return VersionSource.REMOTE;
+			return this.isTesting ? VersionSource.REMOTE_TESTING : VersionSource.REMOTE;
 		}
 		if (this.getRemoteVersion() == null) {
 			return VersionSource.LOCAL;
 		}
 		if (this.getRemoteVersion().getUpdatedTime().after(this.getLocalVersion().getUpdatedTime())) {
-			return VersionSource.REMOTE;
+			return this.isTesting ? VersionSource.REMOTE_TESTING : VersionSource.REMOTE;
 		}
 		return VersionSource.LOCAL;
 	}
@@ -63,6 +67,6 @@ public class VersionSyncInfo {
 	}
 
 	public static enum VersionSource {
-		REMOTE, LOCAL;
+		REMOTE, LOCAL, REMOTE_TESTING;
 	}
 }
