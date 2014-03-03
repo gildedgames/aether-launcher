@@ -115,7 +115,7 @@ public class LauncherDisplay {
 
 	public void init() {
 		try {
-			Display.setTitle("Aether II Launcher 1.01");
+			Display.setTitle("Aether II Launcher 1.02");
 			this.loadIcons();
 			Display.setDisplayMode(new DisplayMode(854, 480));
 
@@ -135,7 +135,7 @@ public class LauncherDisplay {
 			this.craftHosting = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/craftnode.png")));
 			this.facebook = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/facebook.png")));
 			this.twitter = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/twitter.png")));
-			this.audioPlay = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound.png")));
+			this.audioPlay = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound_on.png")));
 			this.audioMute = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound_off.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -160,7 +160,7 @@ public class LauncherDisplay {
 
 		new AdForm(this.panel, null);
 
-		this.music.playAsMusic(1.0f, 0.5f, true);
+		this.startMusic();
 	}
 
 	public void start() {
@@ -204,7 +204,7 @@ public class LauncherDisplay {
 		this.panorama.render();
 
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		this.logo.render((Display.getWidth() - this.logo.getWidth()) / 2, 5);
+		this.logo.render((Display.getWidth() - this.logo.getWidth()) / 2, 15);
 
 		this.panel.render();
 
@@ -212,10 +212,12 @@ public class LauncherDisplay {
 	}
 
 	public void stopMusic() {
+		SoundStore.get().setCurrentMusicVolume(0.0F);
 		this.music.stop();
 	}
 
 	public void startMusic() {
+		SoundStore.get().setCurrentMusicVolume(1F);
 		this.music.playAsMusic(1.0f, 0.5f, true);
 	}
 

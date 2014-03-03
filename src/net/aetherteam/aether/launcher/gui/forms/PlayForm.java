@@ -37,21 +37,21 @@ public class PlayForm extends GuiForm {
 		Font font = new Font("Athelas", Font.BOLD, 24);
 		Font ssfont = new Font("Athelas", Font.BOLD, 18);
 
-		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 157, 264, 284);
+		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 180, 264, 284);
 		this.background.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().backgroundColor);
 		this.add(this.background);
 
 		this.selectProfileLabel = new GuiText(this, ssfont, "Select profile:");
 
 		int profilesW = 210;
-		this.profiles = new GuiDropdown(this, (Display.getWidth() - profilesW) / 2, this.background.getY() + 25 + 20, profilesW, 30, font, Launcher.getInstance().getProfileManager().getAuthenticationService().getAvailableProfileNames());
+		this.profiles = new GuiDropdown(this, (Display.getWidth() - profilesW) / 2, this.background.getY() + 45, profilesW, 30, font, Launcher.getInstance().getProfileManager().getAuthenticationService().getAvailableProfileNames());
 		this.profiles.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.profiles);
 
 		this.selectVersionLabel = new GuiText(this, ssfont, "Select version:");
 
 		int versionsW = 210;
-		this.versions = new GuiDropdown(this, (Display.getWidth() - versionsW) / 2, this.background.getY() + 75 + 25 + 15, versionsW, 30, font, Launcher.getInstance().getVersionManager().getVersions());
+		this.versions = new GuiDropdown(this, (Display.getWidth() - versionsW) / 2, this.background.getY() + 115, versionsW, 30, font, Launcher.getInstance().getVersionManager().getVersions());
 		this.versions.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 
 		/*
@@ -71,12 +71,12 @@ public class PlayForm extends GuiForm {
 		this.add(this.versions);
 
 		GuiText play = new GuiText(this, font, "Play");
-		this.playButton = new GuiButton(this, (Display.getWidth() - 100) / 2, 387 - 50, 100, 35, play);
+		this.playButton = new GuiButton(this, (Display.getWidth() - 100) / 2, 387 - 30, 100, 35, play);
 		this.playButton.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.playButton);
 
 		GuiText logoutText = new GuiText(this, font, "Logout");
-		this.logoutButton = new GuiButton(this, (Display.getWidth() - 100) / 2, 387, 100, 35, logoutText);
+		this.logoutButton = new GuiButton(this, (Display.getWidth() - 100) / 2, 407, 100, 35, logoutText);
 		this.logoutButton.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().textFieldColor);
 		this.add(this.logoutButton);
 
