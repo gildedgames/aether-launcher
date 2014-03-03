@@ -141,6 +141,10 @@ public abstract class GuiElement {
 		return this.hoveringColor;
 	}
 
+	public Color getProblemColor() {
+		return new Color(255, 0, 0, 0.6F);
+	}
+	
 	public boolean shouldRender() {
 		return this.shouldRender;
 	}

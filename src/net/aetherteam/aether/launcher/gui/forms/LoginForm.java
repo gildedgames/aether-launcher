@@ -47,13 +47,14 @@ public class LoginForm extends GuiForm {
 		Font font = new Font("Athelas", Font.BOLD, 18);
 		Font sfont = new Font("Athelas", Font.BOLD, 20);
 		Font ssfont = new Font("Athelas", Font.BOLD, 18);
+		Font sssfont = new Font("Athelas", Font.PLAIN, 14);
 
-		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 157, 264, 254);
+		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 187, 264, 254);
 		this.background.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().backgroundColor);
 		this.add(this.background);
 
 		this.usernameLabel = new GuiText(this, font, "Minecraft Username");
-		this.emailLabel = new GuiText(this, font, "or Mojang Email");
+		this.emailLabel = new GuiText(this, sssfont, "or Mojang Email");
 		this.usernameInput = new GuiText(this, sfont, "");
 		this.usernameField = new GuiTextfield(this, (Display.getWidth() - 210) / 2, this.background.getY() + 60, 210, 30, this.usernameInput, false);
 		this.usernameField.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor);
@@ -65,9 +66,9 @@ public class LoginForm extends GuiForm {
 		this.passwordField.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor);
 		this.add(this.passwordField);
 
-		this.rememberLabel = new GuiText(this, ssfont, "Remember");
-		this.rememberCheckbox = new GuiCheckbox(this, this.passwordField.getX() + 45, this.passwordField.getY() + 40, 20, 20);
-		this.rememberCheckbox.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor, new Color(0, 0, 0, 0.6f));
+		this.rememberLabel = new GuiText(this, ssfont, "Remember Login");
+		this.rememberCheckbox = new GuiCheckbox(this, this.passwordField.getX() + 17, this.passwordField.getY() + 40, 20, 20);
+		this.rememberCheckbox.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor, new Color(255, 255, 255, 0.8f));
 		this.add(this.rememberCheckbox);
 
 		GuiText loginText = new GuiText(this, font, "Login");
@@ -85,7 +86,7 @@ public class LoginForm extends GuiForm {
 		this.usernameLabel.render((Display.getWidth() - this.usernameLabel.getWidth()) / 2, this.usernameField.getY() - 50);
 		this.emailLabel.render((Display.getWidth() - this.emailLabel.getWidth()) / 2, this.usernameField.getY() - 25);
 		this.passwordLabel.render((Display.getWidth() - this.passwordLabel.getWidth()) / 2, this.passwordField.getY() - 25);
-		this.rememberLabel.render(this.rememberCheckbox.getX() + 30, this.rememberCheckbox.getY());
+		this.rememberLabel.render(this.rememberCheckbox.getX() + 30, this.rememberCheckbox.getY() - 2);
 	}
 
 	@Override
@@ -93,6 +94,19 @@ public class LoginForm extends GuiForm {
 		super.onElementClick(element);
 
 		if (element == this.loginButton) {
+			if (this.usernameField.getText().isEmpty() || this.passwordField.getText().isEmpty())
+			{
+				if (this.usernameField.getText().isEmpty())
+				{
+					this.usernameField.flashError();
+				}
+				if (this.passwordField.getText().isEmpty())
+				{
+					this.passwordField.flashError();
+				}
+				
+				return;
+			}
 			Launcher.getInstance().getProfileManager().getAuthenticationService().setRememberMe(this.rememberCheckbox.isChecked());
 			Launcher.getInstance().login(this.usernameField.getText(), this.passwordField.getText());
 
