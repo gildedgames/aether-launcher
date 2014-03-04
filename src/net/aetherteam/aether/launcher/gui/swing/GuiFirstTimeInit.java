@@ -42,6 +42,7 @@ public class GuiFirstTimeInit {
 		frame = new JFrame();
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(GuiFirstTimeInit.class.getResource("/assets/icon_64.png")));
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		frame.setResizable(false);
 		
 		JPanel mainPanel = new GuiFakePanoramaPanel();
 		mainPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
