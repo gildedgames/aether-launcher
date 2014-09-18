@@ -1,7 +1,9 @@
 package net.aetherteam.aether.launcher;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Proxy;
+import java.nio.file.Files;
 import java.util.UUID;
 
 import net.aetherteam.aether.launcher.authentication.GameProfile;
@@ -34,6 +36,19 @@ public class Launcher {
 		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteTestingVersionList(this.proxy));
 
 		Launcher.instance = this;
+		
+		File config = new File(Launcher.instance.getBaseDirectory().getAbsolutePath() + "\\config\\Aether II.cfg");
+		
+	    System.gc();
+	    
+		try
+		{
+			Files.deleteIfExists(config.toPath());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 
 		this.profileManager = new ProfileManager();
 		this.profileManager.loadProfile();
