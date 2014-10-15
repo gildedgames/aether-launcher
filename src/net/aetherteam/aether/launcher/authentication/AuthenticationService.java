@@ -18,13 +18,13 @@ public abstract interface AuthenticationService {
 	public abstract boolean canLogIn();
 
 	public abstract void logIn() throws AuthenticationException;
-
+	
 	public abstract void logOut();
-
+	
 	public abstract boolean isLoggedIn();
-
+	
 	public abstract boolean canPlayOnline();
-
+	
 	public abstract GameProfile[] getAvailableProfiles();
 
 	public abstract GameProfile getSelectedProfile();

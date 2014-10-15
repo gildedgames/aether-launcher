@@ -3,6 +3,7 @@ package net.aetherteam.aether.launcher.gui;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -13,6 +14,7 @@ import net.aetherteam.aether.launcher.gui.forms.AdForm;
 import net.aetherteam.aether.launcher.gui.forms.LoginForm;
 import net.aetherteam.aether.launcher.gui.forms.PlayForm;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
+import net.aetherteam.aether.launcher.utils.FileUtils;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -157,10 +159,20 @@ public class LauncherDisplay {
 		} else {
 			new LoginForm(this.panel, null);
 		}
+		
+		boolean playMusic = true;
+		try {
+			String iets = FileUtils.readFileToString(new File(Launcher.getInstance().getBaseDirectory(), "saveMusic.txt"));
+			playMusic = iets.equals("yes");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		new AdForm(this.panel, null);
+		new AdForm(this.panel, null, playMusic);
 
+		if(playMusic){
 		this.startMusic();
+		}
 	}
 
 	public void start() {
@@ -214,11 +226,21 @@ public class LauncherDisplay {
 	public void stopMusic() {
 		SoundStore.get().setCurrentMusicVolume(0.0F);
 		this.music.stop();
+		try {
+			FileUtils.writeStringToFile(new File(Launcher.getInstance().getBaseDirectory(), "saveMusic.txt"), "no");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void startMusic() {
 		SoundStore.get().setCurrentMusicVolume(1F);
 		this.music.playAsMusic(1.0f, 0.5f, true);
+		try {
+			FileUtils.writeStringToFile(new File(Launcher.getInstance().getBaseDirectory(), "saveMusic.txt"), "yes");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public boolean isMusicPlaying() {

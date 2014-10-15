@@ -8,7 +8,7 @@ public class GuiButton extends GuiRectangle {
 
 	public GuiButton(GuiForm form, int x, int y, int width, int height, GuiText text) {
 		super(form, x, y, width, height);
-
+		
 		this.text = text;
 	}
 

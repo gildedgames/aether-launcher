@@ -22,7 +22,7 @@ public class AdForm extends GuiForm {
 
 	GuiButtonSprite audioMute;
 
-	public AdForm(GuiPanel panel, GuiForm parentForm) {
+	public AdForm(GuiPanel panel, GuiForm parentForm, boolean playMusic) {
 		super(panel, parentForm);
 
 		this.craftHosting = new GuiButtonSprite(this, 10, Display.getHeight() - 50, LauncherDisplay.instance.craftHosting);
@@ -36,10 +36,19 @@ public class AdForm extends GuiForm {
 		this.twitter = new GuiButtonSprite(this, Display.getWidth() - 110, Display.getHeight() - 50, LauncherDisplay.instance.twitter);
 		this.twitter.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 		this.add(this.twitter);
-
-		this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 70, 0, LauncherDisplay.instance.audioPlay);
-		this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
-		this.add(this.audioMute);
+		
+		if(playMusic){
+			this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 70, 0, LauncherDisplay.instance.audioPlay);
+			this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
+			this.add(this.audioMute);
+		}
+		else{
+			this.audioMute = new GuiButtonSprite(this, Display.getWidth() - 70, 0, LauncherDisplay.instance.audioMute);
+			this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
+			this.add(this.audioMute);
+		}
+			
+		
 	}
 
 	@Override
