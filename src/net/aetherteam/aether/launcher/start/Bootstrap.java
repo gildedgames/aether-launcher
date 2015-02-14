@@ -15,6 +15,8 @@ import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
+import net.aetherteam.aether.launcher.gui.swing.GuiFirstTimeInit;
+
 public class Bootstrap {
 
 	public int getLocalVersion() {
@@ -87,7 +89,9 @@ public class Bootstrap {
 	@SuppressWarnings("resource")
 	public void startLauncher() {
 		File workingDir = Util.getWorkingDirectory();
-
+		
+		GuiFirstTimeInit guiFirstTimeInit = new GuiFirstTimeInit();
+		guiFirstTimeInit.start();
 		workingDir.mkdirs();
 
 		File launcherNatives = new File(workingDir, "launcher-natives.zip");
@@ -102,27 +106,34 @@ public class Bootstrap {
 		int remoteLauncherVersion = this.getRemoteVersion();
 		int localLauncherVersion = this.getLocalVersion();
 
-		if (localLauncherVersion < remoteLauncherVersion) {
+		//if (localLauncherVersion < remoteLauncherVersion) {
+			guiFirstTimeInit.setVisible(true);
+			guiFirstTimeInit.setStatus("Downloading natives...");
 			this.downloadFile("http://aether.craftnode.me/launcher/launcher-natives.zip", launcherNatives);
-
+			
+			guiFirstTimeInit.setStatus("Extracting natives...");
 			UnZip unzip = new UnZip();
 			unzip.unZipIt(launcherNatives, launcherNativesDir);
 
+			guiFirstTimeInit.setStatus("Downloading launcher...");
 			this.downloadFile("http://aether.craftnode.me/launcher/launcher.jar", launcherJar);
 			this.updateLocalVersion(remoteLauncherVersion);
-		}
+		//}
 
 		System.out.println("Starting launcher.");
-
+		guiFirstTimeInit.setStatus("Starting launcher...");
+		
 		System.setProperty("org.lwjgl.librarypath", launcherNativesDir.getAbsolutePath());
 
 		try {
+			guiFirstTimeInit.quit();
 			Class<?> aClass = new URLClassLoader(new URL[]{launcherJar.toURI().toURL()}).loadClass("net.aetherteam.aether.launcher.gui.LauncherDisplay");
 			aClass.newInstance();
 		} catch (Exception e) {
 			System.out.println("Unable to start: " + e);
 			e.printStackTrace();
 		}
+		
 	}
 
 	public static void main(String[] args) {
