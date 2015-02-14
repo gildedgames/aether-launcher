@@ -106,7 +106,7 @@ public class Bootstrap {
 		int remoteLauncherVersion = this.getRemoteVersion();
 		int localLauncherVersion = this.getLocalVersion();
 
-		//if (localLauncherVersion < remoteLauncherVersion) {
+		if (localLauncherVersion < remoteLauncherVersion) {
 			guiFirstTimeInit.setVisible(true);
 			guiFirstTimeInit.setStatus("Downloading natives...");
 			this.downloadFile("http://aether.craftnode.me/launcher/launcher-natives.zip", launcherNatives);
@@ -118,7 +118,7 @@ public class Bootstrap {
 			guiFirstTimeInit.setStatus("Downloading launcher...");
 			this.downloadFile("http://aether.craftnode.me/launcher/launcher.jar", launcherJar);
 			this.updateLocalVersion(remoteLauncherVersion);
-		//}
+		}
 
 		System.out.println("Starting launcher.");
 		guiFirstTimeInit.setStatus("Starting launcher...");
