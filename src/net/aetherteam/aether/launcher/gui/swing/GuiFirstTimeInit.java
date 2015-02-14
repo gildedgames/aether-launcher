@@ -48,22 +48,16 @@ public class GuiFirstTimeInit {
 		statusLabel.setForeground(Color.WHITE);
 		statusLabel.setFont(new Font("Athelas", Font.PLAIN, 14));
 		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		statusLabel.setBounds(0, 193, 404, 27);
+		statusLabel.setBounds(0, 130, 404, 27);
 		mainPanel.add(statusLabel);
 
-		GuiFancyLabel htmlLabel = new GuiFancyLabel();
-		htmlLabel.setText("<html><center>Setting up the Aether II launcher...</center></html>");
-		htmlLabel.setForeground(Color.WHITE);
-		htmlLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		htmlLabel.setFont(new Font("Athelas", Font.BOLD, 22));
-		htmlLabel.setBounds(0, 87, 402, 35);
-		mainPanel.add(htmlLabel);
 		frame.setBounds(100, 100, 420, 260);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.frame.setLocation(dim.width / 2 - this.frame.getSize().width / 2,
 				dim.height / 2 - this.frame.getSize().height / 2);
+		this.frame.setTitle("Aether II Launcher Updater");
 	}
 
 	public void setStatus(String text) {
