@@ -38,8 +38,6 @@ public class LauncherDisplay {
 
 	private Sprite logo;
 
-	public Sprite craftHosting;
-
 	public Sprite facebook;
 
 	public Sprite twitter;
@@ -134,7 +132,6 @@ public class LauncherDisplay {
 		try {
 			this.music = AudioLoader.getStreamingAudio("OGG", ResourceLoader.getResource("assets/music.ogg"));
 			this.logo = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/aether_logo.png")));
-			this.craftHosting = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/craftnode.png")));
 			this.facebook = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/facebook.png")));
 			this.twitter = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/twitter.png")));
 			this.audioPlay = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound_on.png")));
