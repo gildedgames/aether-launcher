@@ -17,6 +17,8 @@ public class Library {
 	private ExtractRules extract;
 
 	private String url;
+	
+	public String prependhack = "", packFormat = ".jar";
 
 	public Library() {
 	}
@@ -103,7 +105,7 @@ public class Library {
 			throw new IllegalStateException("Cannot get artifact path of empty/blank artifact");
 		}
 
-		return String.format("%s/%s", new Object[] { this.getArtifactBaseDir(), this.getArtifactFilename(classifier) });
+		return String.format("%s/%s", new Object[] { this.getArtifactBaseDir(), this.getArtifactFilename(classifier) }).replace("${arch}", "64");
 	}
 
 	public String getArtifactFilename() {
@@ -112,7 +114,7 @@ public class Library {
 		}
 
 		String[] parts = this.name.split(":", 3);
-		return String.format("%s-%s.jar", new Object[] { parts[1], parts[2] });
+		return String.format("%s-%s%s%s", new Object[] { parts[1], parts[2], this.prependhack, this.packFormat });
 	}
 
 	public String getArtifactFilename(String classifier) {

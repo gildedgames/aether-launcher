@@ -14,6 +14,7 @@ import java.util.Set;
 
 import net.aetherteam.aether.launcher.OperatingSystem;
 import net.aetherteam.aether.launcher.download.ChecksummedDownloadable;
+import net.aetherteam.aether.launcher.download.CompressedDownloadable;
 import net.aetherteam.aether.launcher.download.Downloadable;
 
 public class CompleteVersion implements Version {
@@ -41,6 +42,8 @@ public class CompleteVersion implements Version {
 	private String incompatibilityReason;
 
 	private List<Rule> rules;
+	
+	private String libraryZipHack;
 
 	private boolean isTestVersion = false;
 
@@ -233,7 +236,14 @@ public class CompleteVersion implements Version {
 				File local = new File(targetDirectory, "libraries/" + file);
 
 				if ((!local.isFile()) || (!library.hasCustomUrl())) {
-					neededFiles.add(new ChecksummedDownloadable(proxy, url, local, ignoreLocalFiles));
+					if (library.packFormat.equals(".jar.pack.xz"))
+					{
+						neededFiles.add(new CompressedDownloadable(proxy, url, local, ignoreLocalFiles));
+					}
+					else
+					{
+						neededFiles.add(new ChecksummedDownloadable(proxy, url, local, ignoreLocalFiles));
+					}
 				}
 			}
 		}

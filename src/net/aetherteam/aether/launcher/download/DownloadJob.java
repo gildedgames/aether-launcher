@@ -121,6 +121,7 @@ public class DownloadJob {
 					String result = downloadable.download();
 					this.successful.add(downloadable);
 					Launcher.getInstance().println("Finished downloading " + downloadable.getTarget() + " for job '" + this.name + "'" + ": " + result);
+					Launcher.getInstance().println("Downloaded from: " + downloadable.getUrl());
 				} catch (Throwable t) {
 					try {
 						throw t;

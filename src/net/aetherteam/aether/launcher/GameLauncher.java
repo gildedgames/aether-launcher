@@ -150,6 +150,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		try {
 			this.unpackNatives(this.version, this.nativeDir);
 		} catch (IOException e) {
+			e.printStackTrace();
 			Launcher.getInstance().println("Couldn't unpack natives!", e);
 			return;
 		}
@@ -159,7 +160,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			assetsDir = this.reconstructAssets();
 		} catch (IOException e) {
 			e.printStackTrace();
-			Launcher.getInstance().println("Couldn't unpack natives!", e);
+			Launcher.getInstance().println("Couldn't reconstruct the assets index!", e);
 			return;
 		}
 
@@ -238,7 +239,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 		map.put("auth_username", authentication.getUsername());
 		map.put("auth_session", (authentication.getSessionToken() == null) && (authentication.canPlayOnline()) ? "-" : authentication.getSessionToken());
-
+		map.put("accessToken", authentication.getSessionToken());
+		
 		if (authentication.getSelectedProfile() != null) {
 			map.put("auth_player_name", authentication.getSelectedProfile().getName());
 			map.put("auth_uuid", authentication.getSelectedProfile().getId());
@@ -252,6 +254,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 		map.put("game_directory", gameDirectory.getAbsolutePath());
 		map.put("game_assets", assetsDirectory.getAbsolutePath());
+		map.put("userProperties", "{}");
+		map.put("userType", "{}");
 
 		for (int i = 0; i < split.length; i++) {
 			split[i] = substitutor.replace(split[i]);
@@ -327,6 +331,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 			if ((nativesPerOs != null) && (nativesPerOs.get(os) != null)) {
 				File file = new File(Launcher.getInstance().getBaseDirectory(), "libraries/" + library.getArtifactPath(nativesPerOs.get(os)));
+				
 				ZipFile zip = new ZipFile(file);
 				ExtractRules extractRules = library.getExtractRules();
 				try {
