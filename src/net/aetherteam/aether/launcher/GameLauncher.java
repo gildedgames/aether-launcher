@@ -390,6 +390,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			try {
 				this.launchGame();
 			} catch (Throwable ex) {
+				ex.printStackTrace();
 				Launcher.getInstance().println("Fatal error launching game. Report this to http://mojang.atlassian.net please!", ex);
 			}
 		}
