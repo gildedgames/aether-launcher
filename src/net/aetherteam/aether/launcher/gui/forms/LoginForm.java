@@ -44,10 +44,10 @@ public class LoginForm extends GuiForm {
 	public LoginForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
-		Font font = new Font("Athelas", Font.BOLD, 18);
-		Font sfont = new Font("Athelas", Font.BOLD, 20);
-		Font ssfont = new Font("Athelas", Font.BOLD, 18);
-		Font sssfont = new Font("Athelas", Font.PLAIN, 14);
+		Font font = Launcher.font.deriveFont(Font.PLAIN, 18);
+		Font sfont = Launcher.font.deriveFont(Font.PLAIN, 20);
+		Font ssfont = Launcher.font.deriveFont(Font.PLAIN, 18);
+		Font sssfont = Launcher.font.deriveFont(Font.PLAIN, 14);
 
 		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 187, 264, 254);
 		this.background.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().backgroundColor);

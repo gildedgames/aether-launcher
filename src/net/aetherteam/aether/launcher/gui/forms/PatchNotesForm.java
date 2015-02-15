@@ -27,9 +27,9 @@ public class PatchNotesForm extends GuiForm {
 	public PatchNotesForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
-		this.font = new Font("Athelas", Font.BOLD, 16);
-		Font sfont = new Font("Athelas", Font.BOLD, 20);
-		Font ssfont = new Font("Athelas", Font.BOLD, 18);
+		this.font = Launcher.font.deriveFont(Font.PLAIN, 16);
+		Font sfont = Launcher.font.deriveFont(Font.PLAIN, 20);
+		Font ssfont = Launcher.font.deriveFont(Font.PLAIN, 18);
 
 		this.background = new GuiRectangle(this, ((Display.getWidth() - 224) / 2) + 264, 157, 224, 254);
 		this.background.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().backgroundColor);

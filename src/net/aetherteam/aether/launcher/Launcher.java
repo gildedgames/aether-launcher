@@ -1,5 +1,7 @@
 package net.aetherteam.aether.launcher;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.io.File;
 import java.io.IOException;
 import java.net.Proxy;
@@ -28,6 +30,8 @@ public class Launcher {
 	protected File baseDirectory;
 
 	private UUID clientToken = UUID.randomUUID();
+	
+	public static Font font;
 
 	public Launcher() {
 		// this.baseDirectory = new
@@ -36,6 +40,14 @@ public class Launcher {
 		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteTestingVersionList(this.proxy));
 
 		Launcher.instance = this;
+		
+		try {
+			font = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream("/assets/Roboto-Regular.ttf"));
+		} catch (FontFormatException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
 		File config = new File(Launcher.instance.getBaseDirectory().getAbsolutePath() + "\\config\\Aether II.cfg");
 		

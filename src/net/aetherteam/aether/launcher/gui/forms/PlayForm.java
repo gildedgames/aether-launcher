@@ -34,8 +34,8 @@ public class PlayForm extends GuiForm {
 	public PlayForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
-		Font font = new Font("Athelas", Font.BOLD, 24);
-		Font ssfont = new Font("Athelas", Font.BOLD, 18);
+		Font font = Launcher.font.deriveFont(Font.PLAIN, 20);
+		Font ssfont = Launcher.font.deriveFont(Font.PLAIN, 18);
 
 		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 180, 264, 284);
 		this.background.setColor(this.panel.getSettings().backgroundColor, this.panel.getSettings().backgroundColor);

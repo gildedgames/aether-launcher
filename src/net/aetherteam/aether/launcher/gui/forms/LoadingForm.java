@@ -2,6 +2,7 @@ package net.aetherteam.aether.launcher.gui.forms;
 
 import java.awt.Font;
 
+import net.aetherteam.aether.launcher.Launcher;
 import net.aetherteam.aether.launcher.gui.GuiPanel;
 import net.aetherteam.aether.launcher.gui.elements.GuiProgressbar;
 import net.aetherteam.aether.launcher.gui.elements.GuiRectangle;
@@ -21,7 +22,7 @@ public class LoadingForm extends GuiForm {
 	public LoadingForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
-		Font font = new Font("Athelas", Font.BOLD, 24);
+		Font font = Launcher.font.deriveFont(Font.PLAIN, 24);
 
 		GuiRectangle rect = new GuiRectangle(this, (Display.getWidth() - 400) / 2, (Display.getHeight() - 150) / 2 + 20, 400, 150);
 		rect.setColor(new Color(0, 0, 0, 0.2f), new Color(0, 0, 0, 0.2f));

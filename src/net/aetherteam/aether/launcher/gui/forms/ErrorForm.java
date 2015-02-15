@@ -2,6 +2,7 @@ package net.aetherteam.aether.launcher.gui.forms;
 
 import java.awt.Font;
 
+import net.aetherteam.aether.launcher.Launcher;
 import net.aetherteam.aether.launcher.gui.GuiPanel;
 import net.aetherteam.aether.launcher.gui.elements.GuiButton;
 import net.aetherteam.aether.launcher.gui.elements.GuiElement;
@@ -27,7 +28,7 @@ public class ErrorForm extends GuiForm {
 		this.rect.setColor(new Color(0, 0, 0, 0.2f), new Color(0, 0, 0, 0.2f));
 		this.add(this.rect);
 
-		Font font = new Font("Athelas", Font.BOLD, 24);
+		Font font = Launcher.font.deriveFont(Font.PLAIN, 24);
 
 		this.errorMessage = new GuiText(this, font, errorMessage);
 
