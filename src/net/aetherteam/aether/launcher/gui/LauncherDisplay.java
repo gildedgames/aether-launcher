@@ -49,6 +49,8 @@ public class LauncherDisplay {
 	public Sprite audioMute;
 
 	public Sprite audioPlay;
+	
+	private float fadeInAlpha = 1f;
 
 	private boolean shouldTerminate;
 
@@ -218,6 +220,25 @@ public class LauncherDisplay {
 		this.panel.render();
 
 		SoundStore.get().poll(0);
+		
+		GL11.glPushMatrix();
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+		GL11.glBegin(GL11.GL_QUADS);
+		new Color(0, 0, 0, this.fadeInAlpha).bind();
+
+		GL11.glVertex3f(0, 0, 0);
+		GL11.glVertex3f(Display.getWidth(), 0, 0);
+		GL11.glVertex3f(Display.getWidth(), Display.getHeight(), 0);
+		GL11.glVertex3f(0, Display.getHeight(), 0);
+		GL11.glEnd();
+
+		GL11.glColor4f(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		this.fadeInAlpha = (float) Math.max(0, this.fadeInAlpha - 0.025);
+		
+		GL11.glPopMatrix();
 	}
 
 	public void stopMusic() {

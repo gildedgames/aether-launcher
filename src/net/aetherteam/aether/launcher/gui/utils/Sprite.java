@@ -28,6 +28,7 @@ public class Sprite {
 		GL11.glVertex2f(x, y + this.texture.getTextureHeight());
 		GL11.glEnd();
 		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 
 	public int getWidth() {
