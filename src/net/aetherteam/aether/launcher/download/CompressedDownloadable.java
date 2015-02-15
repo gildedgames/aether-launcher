@@ -26,6 +26,8 @@ public class CompressedDownloadable extends ChecksummedDownloadable {
 		urlConnect.setDoInput(true);
 		urlConnect.setDoOutput(true);
 		
+		this.getTarget().getParentFile().mkdirs();
+
 		InputStream input = urlConnect.getInputStream();
 		try {
 		  OutputStream output = new FileOutputStream(this.getTarget().getAbsolutePath() + ".pack.xz");

@@ -226,18 +226,15 @@ public class VersionManager {
 		return job;
 	}
 
-	public Set<Downloadable> getResourceFiles(Proxy proxy, File baseDirectory) {
+	public Set<Downloadable> getResourceFiles(Proxy proxy, File baseDirectory, CompleteVersion version) {
 		Set result = new HashSet();
 		InputStream inputStream = null;
 		File assets = new File(baseDirectory, "assets");
 		File objectsFolder = new File(assets, "objects");
 		File indexesFolder = new File(assets, "indexes");
-		String indexName = null;// version.getAssets();
+		String indexName = version.assets;
 		long start = System.nanoTime();
 
-		if (indexName == null) {
-			indexName = "legacy";
-		}
 		File indexFile = new File(indexesFolder, indexName + ".json");
 		try {
 			String json = Http.performGet(new URL("https://s3.amazonaws.com/Minecraft.Download/indexes/" + indexName + ".json"), proxy);

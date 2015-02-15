@@ -18,7 +18,7 @@ public class Library {
 
 	private String url;
 	
-	public String prependhack = "", packFormat = ".jar";
+	public String prependhack = "", packFormat = "";
 
 	public Library() {
 	}
@@ -114,7 +114,7 @@ public class Library {
 		}
 
 		String[] parts = this.name.split(":", 3);
-		return String.format("%s-%s%s%s", new Object[] { parts[1], parts[2], this.prependhack, this.packFormat });
+		return String.format("%s-%s%s.jar", new Object[] { parts[1], parts[2], this.prependhack });
 	}
 
 	public String getArtifactFilename(String classifier) {

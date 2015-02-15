@@ -1,9 +1,12 @@
 package net.aetherteam.aether.launcher.version.assets;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import net.aetherteam.aether.launcher.Launcher;
 
 public class AssetIndex {
 
@@ -12,6 +15,8 @@ public class AssetIndex {
 	private Map<String, AssetObject> objects;
 
 	private boolean virtual;
+	
+	private String version;
 
 	public AssetIndex() {
 		this.objects = new LinkedHashMap();
@@ -27,6 +32,27 @@ public class AssetIndex {
 
 	public boolean isVirtual() {
 		return this.virtual;
+	}
+	
+	public String getAssetDir() {
+		File assetsDir = new File(Launcher.getInstance().getBaseDirectory(), "assets");
+		
+		if (this.virtual)
+		{
+			return new File(new File(assetsDir, "virtual"), this.version).getAbsolutePath();
+		}
+		else
+		{
+			return assetsDir.getAbsolutePath();
+		}
+	}
+	
+	public String getVersion() {
+		return this.version;
+	}
+	
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	public class AssetObject {

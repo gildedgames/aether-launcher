@@ -44,6 +44,8 @@ public class CompleteVersion implements Version {
 	private List<Rule> rules;
 	
 	private String libraryZipHack;
+	
+	public String assets = "legacy";
 
 	private boolean isTestVersion = false;
 
@@ -232,11 +234,11 @@ public class CompleteVersion implements Version {
 			}
 
 			if (file != null) {
-				URL url = new URL(library.getDownloadUrl() + file);
+				URL url = new URL(library.getDownloadUrl() + file + library.packFormat);
 				File local = new File(targetDirectory, "libraries/" + file);
 
 				if ((!local.isFile()) || (!library.hasCustomUrl())) {
-					if (library.packFormat.equals(".jar.pack.xz"))
+					if (library.packFormat.equals(".pack.xz"))
 					{
 						neededFiles.add(new CompressedDownloadable(proxy, url, local, ignoreLocalFiles));
 					}

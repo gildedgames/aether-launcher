@@ -104,7 +104,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		try {
 			DownloadJob job = new DownloadJob("Version & Libraries", false, this);
 			Launcher.getInstance().getVersionManager().downloadVersion(syncInfo, job);
-			job.addDownloadables(Launcher.getInstance().getVersionManager().getResourceFiles(Launcher.getInstance().getProxy(), Launcher.getInstance().getBaseDirectory()));
+			job.addDownloadables(Launcher.getInstance().getVersionManager().getResourceFiles(Launcher.getInstance().getProxy(), Launcher.getInstance().getBaseDirectory(), this.version));
 			job.startDownloading(Launcher.getInstance().getVersionManager().getExecutorService());
 		} catch (IOException e) {
 			Launcher.getInstance().println("Couldn't get version info for " + syncInfo.getLatestVersion(), e);
@@ -155,7 +155,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			return;
 		}
 
-		File assetsDir;
+		AssetIndex assetsDir;
 		try {
 			assetsDir = this.reconstructAssets();
 		} catch (IOException e) {
@@ -180,7 +180,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		processLauncher.directory(gameDirectory);
 
 		if (OperatingSystem.getCurrentPlatform().equals(OperatingSystem.OSX)) {
-			processLauncher.addCommands(new String[]{"-Xdock:icon=" + new File(assetsDir, "icons/minecraft.icns").getAbsolutePath(), "-Xdock:name=Minecraft"});
+			processLauncher.addCommands(new String[]{"-Xdock:icon=" + new File(assetsDir.getAssetDir(), "icons/minecraft.icns").getAbsolutePath(), "-Xdock:name=Minecraft"});
 		}
 
 		boolean is32Bit = "32".equals(System.getProperty("sun.arch.data.model"));
@@ -227,19 +227,18 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		LauncherDisplay.instance.terminate();
 	}
 
-	private String[] getMinecraftArguments(CompleteVersion version, String player, File gameDirectory, File assetsDirectory, AuthenticationService authentication) {
+	private String[] getMinecraftArguments(CompleteVersion version, String player, File gameDirectory, AssetIndex assetsIndex, AuthenticationService authentication) {
 		if (version.getMinecraftArguments() == null) {
 			Launcher.getInstance().println("Can't run version, missing minecraftArguments");
 			return null;
 		}
-
+		
 		Map<String, String> map = new HashMap<String, String>();
 		StrSubstitutor substitutor = new StrSubstitutor(map);
 		String[] split = version.getMinecraftArguments().split(" ");
 
 		map.put("auth_username", authentication.getUsername());
 		map.put("auth_session", (authentication.getSessionToken() == null) && (authentication.canPlayOnline()) ? "-" : authentication.getSessionToken());
-		map.put("accessToken", authentication.getSessionToken());
 		
 		if (authentication.getSelectedProfile() != null) {
 			map.put("auth_player_name", authentication.getSelectedProfile().getName());
@@ -253,9 +252,17 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		map.put("version_name", version.getMinecraftVersion());
 
 		map.put("game_directory", gameDirectory.getAbsolutePath());
-		map.put("game_assets", assetsDirectory.getAbsolutePath());
-		map.put("userProperties", "{}");
-		map.put("userType", "{}");
+		map.put("game_assets", assetsIndex.getAssetDir());
+		
+		// 1.7+
+		map.put("user_properties", "{}");
+		map.put("user_type", "{}");
+		
+		map.put("assets_root", assetsIndex.getAssetDir());
+		map.put("assets_index_name", assetsIndex.getVersion());
+		
+		map.put("auth_access_token", authentication.getSessionToken().substring(6, 39));
+
 
 		for (int i = 0; i < split.length; i++) {
 			split[i] = substitutor.replace(split[i]);
@@ -264,12 +271,12 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		return split;
 	}
 
-	private File reconstructAssets() throws IOException {
+	private AssetIndex reconstructAssets() throws IOException {
 		File assetsDir = new File(Launcher.instance.getBaseDirectory(), "assets");
 		File indexDir = new File(assetsDir, "indexes");
 		File objectDir = new File(assetsDir, "objects");
-		String assetVersion = "legacy";// this.version.getAssets() == null ?
-										// "legacy" : this.version.getAssets();
+		String assetVersion = this.version.assets;
+
 		File indexFile = new File(indexDir, assetVersion + ".json");
 		File virtualRoot = new File(new File(assetsDir, "virtual"), assetVersion);
 
@@ -279,10 +286,11 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 		if (!indexFile.isFile()) {
 			Launcher.getInstance().println("No assets index file " + virtualRoot + "; can't reconstruct assets");
-			return virtualRoot;
+			return null;
 		}
 
 		AssetIndex index = this.gson.fromJson(FileUtils.readFileToString(indexFile), AssetIndex.class);
+		index.setVersion(assetVersion);
 
 		if (index.isVirtual()) {
 			Launcher.getInstance().println("Reconstructing virtual assets folder at " + virtualRoot);
@@ -301,7 +309,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			// this.dateAdapter.serializeToString(new Date()));
 		}
 
-		return virtualRoot;
+		return index;
 	}
 
 	private String constructClassPath(CompleteVersion version) {
