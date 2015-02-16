@@ -31,7 +31,7 @@ public class GuiTextfield extends GuiElement {
 	public void render() {
 		if (GuiTextfield.activeTextfield == this) {
 			if (this.cursorTimer > 30) {
-				GuiElement.renderColoredRect(this.getFadingX() + 6 + Math.min(this.text.getWidth(), 190) + 5, this.y + 2, 5, this.height - 4, this.getHoveringColor());
+				GuiElement.renderColoredRect(this.getFadingX() + 6 + Math.min(this.text.getWidth(), 190) + 2, this.y + 4, 3, this.height - 8, this.getHoveringColor());
 			}
 			
 			this.cursorTimer = this.cursorTimer > 60 ? 0 : this.cursorTimer + 1;
@@ -54,10 +54,10 @@ public class GuiTextfield extends GuiElement {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(330, 40, 220, 500);
 		if(this.text.getWidth() > 200) {
-			this.text.render(this.getFadingX() + 195 - this.text.getWidth(), this.y + ((this.height - this.text.getHeight()) / 2) + (this.isPassword ? -2 : 0));
+			this.text.render(this.getFadingX() + 195 - this.text.getWidth(), this.y + ((this.height - this.text.getHeight()) / 2));
 		}
 		else {
-			this.text.render(this.getFadingX() + 8, this.y + ((this.height - this.text.getHeight()) / 2) + (this.isPassword ? -2 : 0));
+			this.text.render(this.getFadingX() + 8, this.y + ((this.height - this.text.getHeight()) / 2));
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 	}

@@ -114,7 +114,7 @@ public class Library {
 		}
 
 		String[] parts = this.name.split(":", 3);
-		return String.format("%s-%s%s.jar", new Object[] { parts[1], parts[2], this.prependhack });
+		return String.format("%s-%s.jar", new Object[] { parts[1], parts[2] });
 	}
 
 	public String getArtifactFilename(String classifier) {

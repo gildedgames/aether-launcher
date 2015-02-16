@@ -22,14 +22,6 @@ public class Mod {
 	}
 
 	public String getVersionPath(Version version) {
-		return "versions/" + version.getId() + "/" + this.getName();// (version.isTestVersion()
-																	// ?
-																	// "testversions/"
-																	// :
-																	// "versions/")
-																	// +
-																	// version.getId()
-																	// + "/" +
-																	// this.getName();
+		return "versions/" + version.getId() + "/" + this.getName();
 	}
 }

@@ -17,7 +17,9 @@ import net.aetherteam.aether.launcher.version.RemoteVersionList;
 
 public class Launcher {
 
-	static Launcher instance;
+	public static Launcher instance;
+
+	private DiskSettings settings;
 
 	private VersionManager versionManager;
 
@@ -38,8 +40,10 @@ public class Launcher {
 		// File("/Users/cafaxo/aetherlauncher_working/");
 		this.baseDirectory = OperatingSystem.getCurrentPlatform().getWorkingDirectory();
 		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteTestingVersionList(this.proxy));
-
+		
 		Launcher.instance = this;
+		
+		this.settings = DiskSettings.load();
 		
 		try {
 			font = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream("/assets/Roboto-Regular.ttf"));
@@ -138,4 +142,7 @@ public class Launcher {
 		return this.gameLauncher;
 	}
 
+	public DiskSettings getSettings() {
+		return this.settings;
+	}
 }

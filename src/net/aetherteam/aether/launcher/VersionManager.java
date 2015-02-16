@@ -217,7 +217,7 @@ public class VersionManager {
 		CompleteVersion version = this.getLatestCompleteVersion(syncInfo);
 		File baseDirectory = this.localVersionList.getBaseDirectory();
 		Proxy proxy = this.remoteVersionList.getProxy();
-		// TODO check this shit bro
+
 		job.addDownloadables(version.getRequiredDownloadables(OperatingSystem.getCurrentPlatform(), proxy, baseDirectory, false));
 
 		String jarFile = "versions/" + version.getMinecraftVersion() + "/" + version.getMinecraftVersion() + ".jar";

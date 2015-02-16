@@ -3,7 +3,6 @@ package net.aetherteam.aether.launcher.gui;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -14,8 +13,6 @@ import net.aetherteam.aether.launcher.gui.forms.AdForm;
 import net.aetherteam.aether.launcher.gui.forms.LoginForm;
 import net.aetherteam.aether.launcher.gui.forms.PlayForm;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
-import net.aetherteam.aether.launcher.utils.FileUtils;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.openal.AL;
@@ -97,27 +94,20 @@ public class LauncherDisplay {
 	}
 
 	public void loadIcons() {
-		/*
-		 * try { ByteBuffer[] icons = new ByteBuffer[4]; icons[0] =
-		 * loadIcon("assets/icon_16.png", 16, 16); icons[1] =
-		 * loadIcon("assets/icon_32.png", 32, 32); icons[2] =
-		 * loadIcon("assets/icon_128.png", 64, 64); icons[3] =
-		 * loadIcon("assets/icon_128.png", 128, 128); Display.setIcon(icons); }
-		 * catch (IOException ex) { ex.printStackTrace(); }
-		 */
-
 		try {
-			Display.setIcon(new ByteBuffer[]{new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_16.png"))), false, false, null), new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_32.png"))), false, false, null), new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_64.png"))), false, false, null),
+			Display.setIcon(new ByteBuffer[] {
+					new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_16.png"))), false, false, null),
+					new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_32.png"))), false, false, null),
+					new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_64.png"))), false, false, null),
 					new ImageIOImageData().imageToByteBuffer(ImageIO.read(new BufferedInputStream(ResourceLoader.getResourceAsStream("assets/icon_128.png"))), false, false, null)});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public void init() {
 		try {
-			Display.setTitle("Aether II Launcher 1.02");
+			Display.setTitle("Aether II Launcher 1.1");
 			this.loadIcons();
 			Display.setDisplayMode(new DisplayMode(854, 480));
 
@@ -158,19 +148,11 @@ public class LauncherDisplay {
 		} else {
 			new LoginForm(this.panel, null);
 		}
-		
-		boolean playMusic = true;
-		try {
-			String iets = FileUtils.readFileToString(new File(Launcher.getInstance().getBaseDirectory(), "saveMusic.txt"));
-			playMusic = iets.equals("yes");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		new AdForm(this.panel, null, playMusic);
+		new AdForm(this.panel, null, Launcher.getInstance().getSettings().isMusicMuted);
 
-		if(playMusic){
-		this.startMusic();
+		if (!Launcher.getInstance().getSettings().isMusicMuted) {
+			this.startMusic();
 		}
 	}
 
@@ -244,21 +226,17 @@ public class LauncherDisplay {
 	public void stopMusic() {
 		SoundStore.get().setCurrentMusicVolume(0.0F);
 		this.music.stop();
-		try {
-			FileUtils.writeStringToFile(new File(Launcher.getInstance().getBaseDirectory(), "saveMusic.txt"), "no");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		Launcher.getInstance().getSettings().isMusicMuted = true;
+		Launcher.getInstance().getSettings().save();
 	}
 
 	public void startMusic() {
 		SoundStore.get().setCurrentMusicVolume(1F);
 		this.music.playAsMusic(1.0f, 0.5f, true);
-		try {
-			FileUtils.writeStringToFile(new File(Launcher.getInstance().getBaseDirectory(), "saveMusic.txt"), "yes");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		Launcher.getInstance().getSettings().isMusicMuted = false;
+		Launcher.getInstance().getSettings().save();
 	}
 
 	public boolean isMusicPlaying() {

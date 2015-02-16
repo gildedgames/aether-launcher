@@ -22,29 +22,26 @@ public class AdForm extends GuiForm {
 
 	GuiButtonSprite audioMute;
 
-	public AdForm(GuiPanel panel, GuiForm parentForm, boolean playMusic) {
+	public AdForm(GuiPanel panel, GuiForm parentForm, boolean isMusicMuted) {
 		super(panel, parentForm);
 
-		this.facebook = new GuiButtonSprite(this, Display.getWidth() - 60, Display.getHeight() - 55, LauncherDisplay.instance.facebook);
+		this.facebook = new GuiButtonSprite(this, Display.getWidth() - 60, Display.getHeight() - 60, LauncherDisplay.instance.facebook);
 		this.facebook.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 		this.add(this.facebook);
 
-		this.twitter = new GuiButtonSprite(this, Display.getWidth() - 110, Display.getHeight() - 50, LauncherDisplay.instance.twitter);
+		this.twitter = new GuiButtonSprite(this, Display.getWidth() - 120, Display.getHeight() - 60, LauncherDisplay.instance.twitter);
 		this.twitter.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 		this.add(this.twitter);
 		
-		if(playMusic){
-			this.audioMute = new GuiButtonSprite(this, 6, Display.getHeight() - 65, LauncherDisplay.instance.audioPlay);
+		if (isMusicMuted) {
+			this.audioMute = new GuiButtonSprite(this, 8, Display.getHeight() - 64, LauncherDisplay.instance.audioMute);
+			this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
+			this.add(this.audioMute);
+		} else {
+			this.audioMute = new GuiButtonSprite(this, 8, Display.getHeight() - 64, LauncherDisplay.instance.audioPlay);
 			this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 			this.add(this.audioMute);
 		}
-		else{
-			this.audioMute = new GuiButtonSprite(this, 6, Display.getHeight() - 65, LauncherDisplay.instance.audioMute);
-			this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
-			this.add(this.audioMute);
-		}
-			
-		
 	}
 
 	@Override
@@ -67,13 +64,13 @@ public class AdForm extends GuiForm {
 			if (LauncherDisplay.instance.isMusicPlaying()) {
 				LauncherDisplay.instance.stopMusic();
 				this.remove(this.audioMute);
-				this.audioMute = new GuiButtonSprite(this, 6, Display.getHeight() - 65, LauncherDisplay.instance.audioMute);
+				this.audioMute = new GuiButtonSprite(this, 8, Display.getHeight() - 64, LauncherDisplay.instance.audioMute);
 				this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 				this.add(this.audioMute);
 			} else {
 				LauncherDisplay.instance.startMusic();
 				this.remove(this.audioMute);
-				this.audioMute = new GuiButtonSprite(this, 6, Display.getHeight() - 65, LauncherDisplay.instance.audioPlay);
+				this.audioMute = new GuiButtonSprite(this, 8, Display.getHeight() - 64, LauncherDisplay.instance.audioPlay);
 				this.audioMute.setColor(new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.8F));
 				this.add(this.audioMute);
 			}

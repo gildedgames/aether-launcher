@@ -12,6 +12,7 @@ public class RemoteTestingVersionList extends RemoteVersionList {
 		super(proxy);
 	}
 
+	@Override
 	public void refreshVersions() throws IOException {
 		this.clearCache();
 

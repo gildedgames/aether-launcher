@@ -21,7 +21,7 @@ public class RemoteVersionList extends VersionList {
 
 	@Override
 	protected String getUrl(String uri) throws IOException {
-		return Http.performGet(new URL("http://collin1971.net/p/mirrors/aetherii/files/launcher/" + uri), this.proxy);
+		return Http.performGet(new URL("http://collin1971.net/p/mirrors/aetherii/files/" + uri), this.proxy);
 	}
 
 	public Proxy getProxy() {

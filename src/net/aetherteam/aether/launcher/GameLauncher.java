@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import net.aetherteam.aether.launcher.authentication.AuthenticationService;
+import net.aetherteam.aether.launcher.authentication.yggdrasil.YggdrasilAuthenticationService;
 import net.aetherteam.aether.launcher.download.DownloadJob;
 import net.aetherteam.aether.launcher.download.DownloadListener;
 import net.aetherteam.aether.launcher.download.Downloadable;
@@ -191,7 +191,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		processLauncher.addCommands(new String[]{"-cp", this.constructClassPath(this.version)});
 		processLauncher.addCommands(new String[]{this.version.getMainClass()});
 
-		AuthenticationService auth = Launcher.getInstance().getProfileManager().getAuthenticationService();
+		YggdrasilAuthenticationService auth = Launcher.getInstance().getProfileManager().getAuthenticationService();
 
 		String[] args = this.getMinecraftArguments(this.version, auth.getSelectedProfile().getName(), gameDirectory, assetsDir, auth);
 
@@ -227,7 +227,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		LauncherDisplay.instance.terminate();
 	}
 
-	private String[] getMinecraftArguments(CompleteVersion version, String player, File gameDirectory, AssetIndex assetsIndex, AuthenticationService authentication) {
+	private String[] getMinecraftArguments(CompleteVersion version, String player, File gameDirectory, AssetIndex assetsIndex, YggdrasilAuthenticationService authentication) {
 		if (version.getMinecraftArguments() == null) {
 			Launcher.getInstance().println("Can't run version, missing minecraftArguments");
 			return null;
@@ -242,7 +242,7 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		
 		if (authentication.getSelectedProfile() != null) {
 			map.put("auth_player_name", authentication.getSelectedProfile().getName());
-			map.put("auth_uuid", authentication.getSelectedProfile().getId());
+			map.put("auth_uuid", authentication.getClientToken());
 		} else {
 			map.put("auth_player_name", "Player");
 			map.put("auth_uuid", new UUID(0L, 0L).toString());
@@ -261,7 +261,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		map.put("assets_root", assetsIndex.getAssetDir());
 		map.put("assets_index_name", assetsIndex.getVersion());
 		
-		map.put("auth_access_token", authentication.getSessionToken().substring(6, 39));
+		System.out.println(authentication.getAccessToken());
+		map.put("auth_access_token", authentication.getAccessToken());
 
 
 		for (int i = 0; i < split.length; i++) {

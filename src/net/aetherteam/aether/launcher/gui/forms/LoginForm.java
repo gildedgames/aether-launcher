@@ -19,21 +19,9 @@ public class LoginForm extends GuiForm {
 
 	private GuiRectangle background;
 
-	private GuiText usernameLabel;
+	private GuiTextfield usernameField, passwordField;
 
-	private GuiText emailLabel;
-
-	private GuiText usernameInput;
-
-	private GuiTextfield usernameField;
-
-	private GuiText passwordLabel;
-
-	private GuiText passwordInput;
-
-	private GuiTextfield passwordField;
-
-	private GuiText rememberLabel;
+	private GuiText usernameLabel, emailLabel, usernameInput, passwordLabel, passwordInput, rememberLabel;
 
 	private GuiCheckbox rememberCheckbox;
 
@@ -44,9 +32,9 @@ public class LoginForm extends GuiForm {
 	public LoginForm(GuiPanel panel, GuiForm parentForm) {
 		super(panel, parentForm);
 
+		Font lfont = Launcher.font.deriveFont(Font.PLAIN, 24);
 		Font font = Launcher.font.deriveFont(Font.PLAIN, 18);
-		Font sfont = Launcher.font.deriveFont(Font.PLAIN, 20);
-		Font ssfont = Launcher.font.deriveFont(Font.PLAIN, 18);
+		Font sfont = Launcher.font.deriveFont(Font.PLAIN, 16);
 		Font sssfont = Launcher.font.deriveFont(Font.PLAIN, 14);
 
 		this.background = new GuiRectangle(this, (Display.getWidth() - 264) / 2, 187, 264, 254);
@@ -61,13 +49,13 @@ public class LoginForm extends GuiForm {
 		this.add(this.usernameField);
 
 		this.passwordLabel = new GuiText(this, font, "Password");
-		this.passwordInput = new GuiText(this, sfont, "");
+		this.passwordInput = new GuiText(this, lfont, "");
 		this.passwordField = new GuiTextfield(this, (Display.getWidth() - 210) / 2, this.usernameField.getY() + 64, 210, 30, this.passwordInput, true);
 		this.passwordField.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor);
 		this.add(this.passwordField);
 
-		this.rememberLabel = new GuiText(this, ssfont, "Remember Login");
-		this.rememberCheckbox = new GuiCheckbox(this, this.passwordField.getX() + 17, this.passwordField.getY() + 40, 20, 20);
+		this.rememberLabel = new GuiText(this, font, "Remember Login");
+		this.rememberCheckbox = new GuiCheckbox(this, this.passwordField.getX() + 20, this.passwordField.getY() + 40, 20, 20);
 		this.rememberCheckbox.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor, new Color(255, 255, 255, 0.8f));
 		this.add(this.rememberCheckbox);
 
@@ -86,7 +74,7 @@ public class LoginForm extends GuiForm {
 		this.usernameLabel.render((Display.getWidth() - this.usernameLabel.getWidth()) / 2, this.usernameField.getY() - 50);
 		this.emailLabel.render((Display.getWidth() - this.emailLabel.getWidth()) / 2, this.usernameField.getY() - 25);
 		this.passwordLabel.render((Display.getWidth() - this.passwordLabel.getWidth()) / 2, this.passwordField.getY() - 25);
-		this.rememberLabel.render(this.rememberCheckbox.getX() + 30, this.rememberCheckbox.getY() - 2);
+		this.rememberLabel.render(this.rememberCheckbox.getX() + 30, this.rememberCheckbox.getY());
 	}
 
 	@Override
