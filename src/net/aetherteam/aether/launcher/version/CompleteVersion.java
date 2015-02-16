@@ -234,7 +234,7 @@ public class CompleteVersion implements Version {
 			}
 
 			if (file != null) {
-				URL url = new URL(library.getDownloadUrl() + ".jar" + library.packFormat);
+				URL url = new URL(library.getDownloadUrl() + file + library.packFormat);
 				File local = new File(targetDirectory, "libraries/" + file);
 
 				if ((!local.isFile()) || (!library.hasCustomUrl())) {
