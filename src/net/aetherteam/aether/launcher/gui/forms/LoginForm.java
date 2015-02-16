@@ -55,7 +55,7 @@ public class LoginForm extends GuiForm {
 		this.add(this.passwordField);
 
 		this.rememberLabel = new GuiText(this, font, "Remember Login");
-		this.rememberCheckbox = new GuiCheckbox(this, this.passwordField.getX() + 20, this.passwordField.getY() + 40, 20, 20);
+		this.rememberCheckbox = new GuiCheckbox(this, this.passwordField.getX() + 20, this.passwordField.getY() + 40, 20, 20, true);
 		this.rememberCheckbox.setColor(this.panel.getSettings().textFieldColor, this.panel.getSettings().textFieldHoveredColor, new Color(255, 255, 255, 0.8f));
 		this.add(this.rememberCheckbox);
 

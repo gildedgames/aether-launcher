@@ -65,7 +65,7 @@ public class VersionManager {
 		this.selectedProfile = selectedProfile;
 		this.localVersionList.refreshVersions();
 		this.remoteVersionList.refreshVersions();
-		this.remoteTestingVersionList.refreshVersions();
+		//this.remoteTestingVersionList.refreshVersions();
 
 		boolean isDonator = StringUtils.isNotBlank(selectedProfile) ? this.isBetaTester(selectedProfile) : false;
 

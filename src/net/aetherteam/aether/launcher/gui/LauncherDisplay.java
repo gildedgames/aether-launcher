@@ -13,6 +13,7 @@ import net.aetherteam.aether.launcher.gui.forms.AdForm;
 import net.aetherteam.aether.launcher.gui.forms.LoginForm;
 import net.aetherteam.aether.launcher.gui.forms.PlayForm;
 import net.aetherteam.aether.launcher.gui.utils.Sprite;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.openal.AL;
@@ -46,6 +47,8 @@ public class LauncherDisplay {
 	public Sprite audioMute;
 
 	public Sprite audioPlay;
+	
+	public Sprite checkboxCheck;
 	
 	private float fadeInAlpha = 1f;
 
@@ -128,6 +131,7 @@ public class LauncherDisplay {
 			this.twitter = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/twitter.png")));
 			this.audioPlay = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound_on.png")));
 			this.audioMute = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/sound_off.png")));
+			this.checkboxCheck = new Sprite(TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("assets/check.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -172,18 +176,18 @@ public class LauncherDisplay {
 		GL11.glLoadIdentity();
 		GL11.glViewport(0, 0, Display.getWidth(), Display.getHeight());
 
-		while (true) {
+		while (!Display.isCloseRequested() && !this.shouldTerminate)
+		{
 			this.render();
 
 			Display.update();
 			Display.sync(60);
-
-			if (Display.isCloseRequested() || this.shouldTerminate) {
-				Display.destroy();
-				AL.destroy();
-				System.exit(0);
-			}
 		}
+
+		Display.destroy();
+		AL.destroy();
+		
+		Launcher.instance.getProfileManager().saveProfile();
 	}
 
 	public void terminate() {

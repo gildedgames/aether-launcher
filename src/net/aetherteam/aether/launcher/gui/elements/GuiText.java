@@ -55,7 +55,7 @@ public class GuiText extends GuiElement {
 		}
 
 		if (this.isDirty) {
-			BufferedImage fontImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			BufferedImage fontImage = new BufferedImage(this.getWidth() + 4, this.getHeight() + 4, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D gt = (Graphics2D) fontImage.getGraphics();
 
 			gt.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -66,10 +66,10 @@ public class GuiText extends GuiElement {
 
 			gt.setFont(this.font);
 			gt.setColor(java.awt.Color.WHITE);
-			gt.drawString(this.text, 0, this.fontMetrics.getAscent());
+			gt.drawString(this.text, 2, 2 + this.fontMetrics.getAscent());
 
 			if (this.applyShadow) {
-				BufferedImage blurredImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				BufferedImage blurredImage = new BufferedImage(this.getWidth() + 4, this.getHeight() + 4, BufferedImage.TYPE_INT_ARGB);
 
 				GaussianFilter gaussianFilter = new GaussianFilter(7);
 				gaussianFilter.filter(fontImage, blurredImage);

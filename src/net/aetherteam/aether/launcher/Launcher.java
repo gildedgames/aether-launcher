@@ -1,7 +1,6 @@
 package net.aetherteam.aether.launcher;
 
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.io.File;
 import java.io.IOException;
 import java.net.Proxy;
@@ -36,21 +35,17 @@ public class Launcher {
 	public static Font font;
 
 	public Launcher() {
-		// this.baseDirectory = new
-		// File("/Users/cafaxo/aetherlauncher_working/");
 		this.baseDirectory = OperatingSystem.getCurrentPlatform().getWorkingDirectory();
 		this.versionManager = new VersionManager(new LocalVersionList(this.baseDirectory), new RemoteVersionList(this.proxy), new RemoteTestingVersionList(this.proxy));
 		
 		Launcher.instance = this;
-		
+
 		this.settings = DiskSettings.load();
 		
 		try {
 			font = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream("/assets/Roboto-Regular.ttf"));
-		} catch (FontFormatException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException("Couldn't load the required font 'Roboto-Regular.ttf'.", e);
 		}
 		
 		File config = new File(Launcher.instance.getBaseDirectory().getAbsolutePath() + "\\config\\Aether II.cfg");
@@ -96,7 +91,6 @@ public class Launcher {
 
 		try {
 			auth.logIn();
-			this.profileManager.saveProfile();
 		} catch (AuthenticationException e) {
 			this.println("Invalid creditentials");
 		}
