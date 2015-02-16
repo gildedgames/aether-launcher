@@ -113,11 +113,23 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 	}
 
 	protected void launchGame() {
+		File gameDirectory = new File(Launcher.getInstance().getBaseDirectory(), "profiles/" + this.version.getId() + "/");
+		gameDirectory.mkdirs();
+
 		Launcher.getInstance().println("Copying mods");
 
 		for (Mod mod : this.version.getMods()) {
 			File source = new File(Launcher.instance.getBaseDirectory(), mod.getVersionPath(this.version));
-			File target = new File(Launcher.instance.getBaseDirectory(), mod.getPath());
+			
+			File target;
+			if (mod.isRelative)
+			{
+				target = new File(gameDirectory, mod.getPath());
+			}
+			else
+			{
+				target = new File(Launcher.instance.getBaseDirectory(), mod.getPath());
+			}
 
 			try {
 				target.getParentFile().mkdirs();
@@ -164,7 +176,6 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 			return;
 		}
 
-		File gameDirectory = Launcher.getInstance().getBaseDirectory();
 		Launcher.getInstance().println("Launching in " + gameDirectory);
 
 		if (!gameDirectory.exists()) {

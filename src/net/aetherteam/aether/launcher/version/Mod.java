@@ -5,6 +5,8 @@ public class Mod {
 	private String path;
 
 	private String url;
+	
+	public boolean isRelative = true;
 
 	public Mod() {
 	}

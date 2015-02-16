@@ -18,7 +18,7 @@ public class Library {
 
 	private String url;
 	
-	public String prependhack = "", packFormat = "";
+	public String packFormat = "";
 
 	public Library() {
 	}
