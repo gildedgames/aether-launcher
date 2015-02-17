@@ -66,7 +66,7 @@ public class GuiText extends GuiElement {
 
 			gt.setFont(this.font);
 			gt.setColor(java.awt.Color.WHITE);
-			gt.drawString(this.text, 2, 2 + this.fontMetrics.getAscent());
+			gt.drawString(this.text, 0, this.fontMetrics.getAscent());
 
 			if (this.applyShadow) {
 				BufferedImage blurredImage = new BufferedImage(this.getWidth() + 4, this.getHeight() + 4, BufferedImage.TYPE_INT_ARGB);
