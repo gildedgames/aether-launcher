@@ -188,6 +188,8 @@ public class LauncherDisplay {
 		AL.destroy();
 		
 		Launcher.instance.getProfileManager().saveProfile();
+		
+		System.exit(0);
 	}
 
 	public void terminate() {

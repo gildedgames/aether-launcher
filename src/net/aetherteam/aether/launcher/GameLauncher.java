@@ -253,10 +253,8 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		
 		if (authentication.getSelectedProfile() != null) {
 			map.put("auth_player_name", authentication.getSelectedProfile().getName());
-			map.put("auth_uuid", authentication.getClientToken());
 		} else {
 			map.put("auth_player_name", "Player");
-			map.put("auth_uuid", new UUID(0L, 0L).toString());
 		}
 
 		map.put("profile_name", player);
@@ -272,12 +270,12 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 		map.put("assets_root", assetsIndex.getAssetDir());
 		map.put("assets_index_name", assetsIndex.getVersion());
 		
-		System.out.println(authentication.getAccessToken());
 		map.put("auth_access_token", authentication.getAccessToken());
-
+		map.put("auth_uuid", authentication.getSelectedProfile().getId());
 
 		for (int i = 0; i < split.length; i++) {
 			split[i] = substitutor.replace(split[i]);
+			System.out.println(substitutor.replace(split[i]));
 		}
 
 		return split;

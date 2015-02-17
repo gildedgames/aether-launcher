@@ -72,6 +72,8 @@ public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 		this.accessToken = response.getAccessToken();
 		this.profiles = response.getAvailableProfiles();
 		this.setSelectedProfile(response.getSelectedProfile());
+		
+		System.out.println("(login-password) HASH VALIDATION: " + this.hashCode());
 	}
 
 	protected void logInWithToken() throws AuthenticationException {
