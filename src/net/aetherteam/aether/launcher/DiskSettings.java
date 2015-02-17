@@ -10,6 +10,8 @@ public class DiskSettings {
 	
 	public boolean isMusicMuted = false;
 	
+	public int versionIndex = -1;
+	
 	public void save()
 	{
 		try {

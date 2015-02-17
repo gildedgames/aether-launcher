@@ -105,7 +105,7 @@ public class Library {
 			throw new IllegalStateException("Cannot get artifact path of empty/blank artifact");
 		}
 
-		return String.format("%s/%s", new Object[] { this.getArtifactBaseDir(), this.getArtifactFilename(classifier) }).replace("${arch}", "64");
+		return String.format("%s/%s", new Object[] { this.getArtifactBaseDir(), this.getArtifactFilename(classifier) }).replace("${arch}", System.getProperty("sun.arch.data.model"));
 	}
 
 	public String getArtifactFilename() {

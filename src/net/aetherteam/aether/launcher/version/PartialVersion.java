@@ -4,7 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 public class PartialVersion implements Version {
-
+	private int updateId;
+	
 	private String id;
 
 	private Date time;
@@ -87,5 +88,10 @@ public class PartialVersion implements Version {
 	public void setIsTestVersion(boolean b) {
 		this.isTestVersion = b;
 
+	}
+
+	@Override
+	public int getUpdateId() {
+		return this.updateId;
 	}
 }

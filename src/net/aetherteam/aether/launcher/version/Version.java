@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface Version {
 
+	public abstract int getUpdateId();
+	
 	public abstract String getId();
 
 	public abstract Date getUpdatedTime();

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Set;
 
 import net.aetherteam.aether.launcher.Launcher;
@@ -45,6 +47,8 @@ public class LocalVersionList extends VersionList {
 		if (files == null) {
 			return;
 		}
+		
+		int remoteVersion = getRemoteIndexVersion();
 
 		for (File directory : files) {
 			String id = directory.getName();
@@ -52,8 +56,16 @@ public class LocalVersionList extends VersionList {
 
 			if ((directory.isDirectory()) && (jsonFile.exists())) {
 				try {
-					CompleteVersion version = this.gson.fromJson(this.getUrl("versions/" + id + "/" + id + ".json"), CompleteVersion.class);
-					this.addVersion(version);
+					if (Launcher.getInstance().getSettings().versionIndex < remoteVersion)
+					{
+						System.out.println("Deleting local version " + jsonFile.getAbsolutePath() + " because the remote server reported it's outdated.");
+						jsonFile.delete();
+					}
+					else
+					{
+						CompleteVersion version = this.gson.fromJson(this.getUrl("versions/" + id + "/" + id + ".json"), CompleteVersion.class);
+						this.addVersion(version);	
+					}
 				} catch (JsonSyntaxException ex) {
 					if (Launcher.getInstance() != null) {
 						Launcher.getInstance().println("Couldn't load local version " + jsonFile.getAbsolutePath(), ex);
@@ -63,6 +75,24 @@ public class LocalVersionList extends VersionList {
 				}
 			}
 		}
+		
+		Launcher.getInstance().getSettings().versionIndex = remoteVersion;
+		Launcher.getInstance().getSettings().save();
+	}
+	
+	private int getRemoteIndexVersion() {
+		int remoteVersion = -1;
+		
+		try {
+			URL website = new URL("http://collin1971.net/p/mirrors/aetherii/files/versions/versionsIndex.txt");
+			BufferedReader br = new BufferedReader(new InputStreamReader(website.openStream(), "UTF-8"));
+			remoteVersion = Integer.parseInt(br.readLine());
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return remoteVersion;
 	}
 
 	public void saveVersionList() throws IOException {

@@ -18,7 +18,8 @@ import net.aetherteam.aether.launcher.download.CompressedDownloadable;
 import net.aetherteam.aether.launcher.download.Downloadable;
 
 public class CompleteVersion implements Version {
-
+	private int updateId;
+	
 	private String id;
 
 	private Date time;
@@ -317,5 +318,10 @@ public class CompleteVersion implements Version {
 	@Override
 	public void setIsTestVersion(boolean b) {
 		this.isTestVersion = b;
+	}
+
+	@Override
+	public int getUpdateId() {
+		return this.updateId;
 	}
 }

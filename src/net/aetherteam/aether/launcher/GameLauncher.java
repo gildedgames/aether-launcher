@@ -4,7 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
@@ -12,7 +15,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -103,6 +105,46 @@ public class GameLauncher implements DownloadListener, JavaProcessRunnable, Runn
 
 		try {
 			DownloadJob job = new DownloadJob("Version & Libraries", false, this);
+
+			boolean forceUpdate = true;
+			File versionFolder = new File(Launcher.getInstance().getBaseDirectory(), "versions/" + this.version.getId() + "/");
+			File versionFile = new File(versionFolder, this.version.getId() + ".json");
+			File persistentFile = new File(versionFolder, "persistent.donotdelete");
+			
+			try
+			{
+				if (persistentFile.exists())
+				{
+					byte[] encoded = Files.readAllBytes(persistentFile.toPath());
+					int persistentVersion = Integer.parseInt(new String(encoded, Charset.defaultCharset()));
+					
+					System.out.println(persistentVersion);
+					
+					if (persistentVersion >= this.version.getUpdateId())
+					{
+						forceUpdate = false;
+					}
+				}	
+			}
+			catch (Exception e) {
+				forceUpdate = true;
+				e.printStackTrace();
+				System.out.println("Error loading persistant.donotdelete, assuming forceUpdate.");
+			}
+			
+			if (forceUpdate) {
+				for (File file : versionFolder.listFiles())
+				{
+					if (!file.getAbsolutePath().equals(versionFile.getAbsolutePath())) {
+						file.delete();
+					}
+				}
+
+				Writer writer = new FileWriter(persistentFile);
+				writer.write(String.valueOf(this.version.getUpdateId()));
+				writer.close();
+			}
+			
 			Launcher.getInstance().getVersionManager().downloadVersion(syncInfo, job);
 			job.addDownloadables(Launcher.getInstance().getVersionManager().getResourceFiles(Launcher.getInstance().getProxy(), Launcher.getInstance().getBaseDirectory(), this.version));
 			job.startDownloading(Launcher.getInstance().getVersionManager().getExecutorService());
